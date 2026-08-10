@@ -286,26 +286,19 @@
       pointer-events:none;
     }
     .zone-shape {
-      fill:transparent; stroke:transparent;
+      fill:transparent; stroke:transparent; stroke-width:.3;
       cursor:pointer; pointer-events:all;
-      transition:fill .18s, stroke .18s;
+      transition:fill .2s ease, stroke .2s ease;
     }
-    .zone-shape:hover       { fill:rgba(232,196,74,.28); stroke:rgba(232,196,74,.9); stroke-width:.5; }
-    .zone-shape.risk-high:hover { fill:rgba(192,57,43,.22);  stroke:rgba(192,57,43,.85);  }
-    .zone-shape.risk-mid:hover  { fill:rgba(230,126,34,.22); stroke:rgba(230,126,34,.85); }
-    .zone-shape.risk-low:hover  { fill:rgba(45,106,45,.22);  stroke:rgba(45,106,45,.85);  }
-    .zone-shape.active      { stroke-width:.6; }
-    .zone-shape.active.risk-high { fill:rgba(192,57,43,.3);  stroke:rgba(192,57,43,1); }
-    .zone-shape.active.risk-mid  { fill:rgba(230,126,34,.3); stroke:rgba(230,126,34,1); }
-    .zone-shape.active.risk-low  { fill:rgba(45,106,45,.3);  stroke:rgba(45,106,45,1); }
-
-    .zone-label {
-      font-size:1.8px; font-weight:700; fill:#fff;
-      text-anchor:middle; dominant-baseline:middle;
-      pointer-events:none;
-      paint-order:stroke; stroke:#000; stroke-width:.6px;
-      stroke-linejoin:round;
-    }
+    /* 기본: 완전 투명 — 지도 원본 그대로 보임 */
+    /* hover: 색상별 반투명 하이라이트만 */
+    .zone-shape.risk-high:hover { fill:rgba(192,57,43,.18);  stroke:rgba(192,57,43,.7); }
+    .zone-shape.risk-mid:hover  { fill:rgba(230,126,34,.18); stroke:rgba(230,126,34,.7); }
+    .zone-shape.risk-low:hover  { fill:rgba(45,106,45,.18);  stroke:rgba(45,106,45,.7); }
+    /* active(클릭됨): hover보다 약간 진하게 */
+    .zone-shape.active.risk-high { fill:rgba(192,57,43,.28); stroke:rgba(192,57,43,.95); stroke-width:.5; }
+    .zone-shape.active.risk-mid  { fill:rgba(230,126,34,.28);stroke:rgba(230,126,34,.95);stroke-width:.5; }
+    .zone-shape.active.risk-low  { fill:rgba(45,106,45,.28); stroke:rgba(45,106,45,.95); stroke-width:.5; }
 
     /* ── ZONE BRIEFING DRAWER ── */
     .zone-drawer {
@@ -482,65 +475,19 @@
         <svg class="zone-svg" id="zone-svg"
              viewBox="0 0 100 70" preserveAspectRatio="none">
 
-          <!-- ① 잔디마당 -->
-          <ellipse class="zone-shape risk-low" data-zone="1"
-            cx="29" cy="38" rx="8" ry="8.5" />
-          <text class="zone-label" x="29" y="38">①잔디마당</text>
-
-          <!-- ② 방문자센터 -->
-          <rect class="zone-shape risk-low" data-zone="2"
-            x="13.5" y="27" width="7.5" height="10" rx=".8"/>
-          <text class="zone-label" x="17.3" y="32.5">②방문자센터</text>
-
-          <!-- ③ 카페테리아 -->
-          <rect class="zone-shape risk-high" data-zone="3"
-            x="15.5" y="37.5" width="7" height="7.5" rx=".8"/>
-          <text class="zone-label" x="19" y="41.5">③카페테리아</text>
-
-          <!-- ④ 풋살장 -->
-          <rect class="zone-shape risk-mid" data-zone="4"
-            x="25.5" y="24.5" width="8" height="9" rx=".8"/>
-          <text class="zone-label" x="29.5" y="29.5">④풋살장</text>
-
-          <!-- ⑤ 테니스장 -->
-          <rect class="zone-shape risk-mid" data-zone="5"
-            x="31" y="18.5" width="9.5" height="9.5" rx=".8"/>
-          <text class="zone-label" x="35.8" y="23.5">⑤테니스장</text>
-
-          <!-- ⑥ 교육농장 -->
-          <rect class="zone-shape risk-mid" data-zone="6"
-            x="20" y="12" width="11" height="11" rx=".8"/>
-          <text class="zone-label" x="25.5" y="17.8">⑥교육농장</text>
-
-          <!-- ⑦ 텃밭체험장 -->
-          <rect class="zone-shape risk-high" data-zone="7"
-            x="20.5" y="42" width="9.5" height="9.5" rx=".8"/>
-          <text class="zone-label" x="25.3" y="47">⑦텃밭체험장</text>
-
-          <!-- ⑧ 피크닉장 -->
-          <rect class="zone-shape risk-high" data-zone="8"
-            x="30" y="41" width="11" height="9.5" rx=".8"/>
-          <text class="zone-label" x="35.5" y="46">⑧피크닉장</text>
-
-          <!-- ⑨ 놀이터 -->
-          <rect class="zone-shape risk-high" data-zone="9"
-            x="38" y="31" width="10.5" height="11" rx=".8"/>
-          <text class="zone-label" x="43.3" y="37">⑨놀이터</text>
-
-          <!-- ⑩ 수변공간 -->
-          <rect class="zone-shape risk-high" data-zone="10"
-            x="34" y="47.5" width="11" height="10" rx=".8"/>
-          <text class="zone-label" x="39.5" y="53">⑩수변공간</text>
-
-          <!-- ⑪ 농업체험장 -->
-          <rect class="zone-shape risk-mid" data-zone="11"
-            x="17" y="50" width="10.5" height="11" rx=".8"/>
-          <text class="zone-label" x="22.3" y="56">⑪농업체험장</text>
-
-          <!-- ⑫ 주차장 -->
-          <rect class="zone-shape risk-mid" data-zone="12"
-            x="38.5" y="10" width="15" height="11" rx=".8"/>
-          <text class="zone-label" x="46" y="16">⑫주차장</text>
+          <!-- 텍스트 없이 투명 구역만 — 지도 원본 번호가 그대로 보임 -->
+          <ellipse class="zone-shape risk-low"  data-zone="1"  cx="29"  cy="38"  rx="8"   ry="8.5"/>
+          <rect    class="zone-shape risk-low"  data-zone="2"  x="13.5" y="27"   width="7.5"  height="10"  rx=".8"/>
+          <rect    class="zone-shape risk-high" data-zone="3"  x="15.5" y="37.5" width="7"    height="7.5" rx=".8"/>
+          <rect    class="zone-shape risk-mid"  data-zone="4"  x="25.5" y="24.5" width="8"    height="9"   rx=".8"/>
+          <rect    class="zone-shape risk-mid"  data-zone="5"  x="31"   y="18.5" width="9.5"  height="9.5" rx=".8"/>
+          <rect    class="zone-shape risk-mid"  data-zone="6"  x="20"   y="12"   width="11"   height="11"  rx=".8"/>
+          <rect    class="zone-shape risk-high" data-zone="7"  x="20.5" y="42"   width="9.5"  height="9.5" rx=".8"/>
+          <rect    class="zone-shape risk-high" data-zone="8"  x="30"   y="41"   width="11"   height="9.5" rx=".8"/>
+          <rect    class="zone-shape risk-high" data-zone="9"  x="38"   y="31"   width="10.5" height="11"  rx=".8"/>
+          <rect    class="zone-shape risk-high" data-zone="10" x="34"   y="47.5" width="11"   height="10"  rx=".8"/>
+          <rect    class="zone-shape risk-mid"  data-zone="11" x="17"   y="50"   width="10.5" height="11"  rx=".8"/>
+          <rect    class="zone-shape risk-mid"  data-zone="12" x="38.5" y="10"   width="15"   height="11"  rx=".8"/>
 
         </svg>
       </div>
