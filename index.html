@@ -286,19 +286,29 @@
       pointer-events:none;
     }
     .zone-shape {
-      fill:transparent; stroke:transparent; stroke-width:.3;
+      fill:transparent;
+      stroke:rgba(255,220,0,.25); stroke-width:.25;
       cursor:pointer; pointer-events:all;
-      transition:fill .2s ease, stroke .2s ease;
+      transition:fill .18s ease, stroke .18s ease, stroke-width .18s;
     }
-    /* 기본: 완전 투명 — 지도 원본 그대로 보임 */
-    /* hover: 색상별 반투명 하이라이트만 */
-    .zone-shape.risk-high:hover { fill:rgba(192,57,43,.18);  stroke:rgba(192,57,43,.7); }
-    .zone-shape.risk-mid:hover  { fill:rgba(230,126,34,.18); stroke:rgba(230,126,34,.7); }
-    .zone-shape.risk-low:hover  { fill:rgba(45,106,45,.18);  stroke:rgba(45,106,45,.7); }
-    /* active(클릭됨): hover보다 약간 진하게 */
-    .zone-shape.active.risk-high { fill:rgba(192,57,43,.28); stroke:rgba(192,57,43,.95); stroke-width:.5; }
-    .zone-shape.active.risk-mid  { fill:rgba(230,126,34,.28);stroke:rgba(230,126,34,.95);stroke-width:.5; }
-    .zone-shape.active.risk-low  { fill:rgba(45,106,45,.28); stroke:rgba(45,106,45,.95); stroke-width:.5; }
+    .zone-shape.risk-high:hover { fill:rgba(192,57,43,.2);   stroke:rgba(220,60,40,.85);  stroke-width:.4; }
+    .zone-shape.risk-mid:hover  { fill:rgba(230,126,34,.2);  stroke:rgba(230,126,34,.85); stroke-width:.4; }
+    .zone-shape.risk-low:hover  { fill:rgba(45,106,45,.2);   stroke:rgba(45,140,45,.85);  stroke-width:.4; }
+    .zone-shape.active.risk-high { fill:rgba(192,57,43,.28); stroke:rgba(220,60,40,1);    stroke-width:.5; }
+    .zone-shape.active.risk-mid  { fill:rgba(230,126,34,.28);stroke:rgba(230,126,34,1);   stroke-width:.5; }
+    .zone-shape.active.risk-low  { fill:rgba(45,106,45,.28); stroke:rgba(45,140,45,1);    stroke-width:.5; }
+
+    /* ── ZONE TOOLTIP ── */
+    .zone-tooltip {
+      position:absolute; pointer-events:none;
+      background:rgba(10,30,10,.82); color:#fff;
+      font-size:11px; font-weight:500;
+      padding:4px 9px; border-radius:6px;
+      white-space:nowrap; z-index:20;
+      opacity:0; transition:opacity .15s;
+      transform:translate(-50%, -130%);
+    }
+    .zone-tooltip.show { opacity:1; }
 
     /* ── ZONE BRIEFING DRAWER ── */
     .zone-drawer {
@@ -471,25 +481,38 @@
       <!-- 지도 이미지 + 구역 SVG 오버레이 -->
       <div class="map-img-wrap" id="map-img-wrap" style="position:relative;">
         <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" style="width:100%;display:block;" />
-        <!-- SVG 구역 레이어: viewBox는 이미지 비율(100x70) 기반 -->
+        <!-- SVG 좌표: viewBox="0 0 100 70" — x는 이미지 너비%, y는 이미지 높이*0.7 -->
         <svg class="zone-svg" id="zone-svg"
              viewBox="0 0 100 70" preserveAspectRatio="none">
 
-          <!-- 텍스트 없이 투명 구역만 — 지도 원본 번호가 그대로 보임 -->
-          <ellipse class="zone-shape risk-low"  data-zone="1"  cx="29"  cy="38"  rx="8"   ry="8.5"/>
-          <rect    class="zone-shape risk-low"  data-zone="2"  x="13.5" y="27"   width="7.5"  height="10"  rx=".8"/>
-          <rect    class="zone-shape risk-high" data-zone="3"  x="15.5" y="37.5" width="7"    height="7.5" rx=".8"/>
-          <rect    class="zone-shape risk-mid"  data-zone="4"  x="25.5" y="24.5" width="8"    height="9"   rx=".8"/>
-          <rect    class="zone-shape risk-mid"  data-zone="5"  x="31"   y="18.5" width="9.5"  height="9.5" rx=".8"/>
-          <rect    class="zone-shape risk-mid"  data-zone="6"  x="20"   y="12"   width="11"   height="11"  rx=".8"/>
-          <rect    class="zone-shape risk-high" data-zone="7"  x="20.5" y="42"   width="9.5"  height="9.5" rx=".8"/>
-          <rect    class="zone-shape risk-high" data-zone="8"  x="30"   y="41"   width="11"   height="9.5" rx=".8"/>
-          <rect    class="zone-shape risk-high" data-zone="9"  x="38"   y="31"   width="10.5" height="11"  rx=".8"/>
-          <rect    class="zone-shape risk-high" data-zone="10" x="34"   y="47.5" width="11"   height="10"  rx=".8"/>
-          <rect    class="zone-shape risk-mid"  data-zone="11" x="17"   y="50"   width="10.5" height="11"  rx=".8"/>
-          <rect    class="zone-shape risk-mid"  data-zone="12" x="38.5" y="10"   width="15"   height="11"  rx=".8"/>
+          <!-- ① 잔디마당: 중앙 타원형 잔디 -->
+          <ellipse class="zone-shape risk-low"  data-zone="1"  cx="26.5" cy="36.3" rx="5.5" ry="5"/>
+          <!-- ② 방문자센터: 좌측 청색 건물군 -->
+          <rect    class="zone-shape risk-low"  data-zone="2"  x="12"   y="32.2"  width="6"    height="5.5" rx=".8"/>
+          <!-- ③ 카페테리아: 방문자센터 하단 -->
+          <rect    class="zone-shape risk-high" data-zone="3"  x="14.5" y="38"    width="6"    height="5.2" rx=".8"/>
+          <!-- ④ 풋살장: 상단 중앙 블루코트 -->
+          <rect    class="zone-shape risk-mid"  data-zone="4"  x="29"   y="28"    width="6.5"  height="5.5" rx=".8"/>
+          <!-- ⑤ 테니스장: 풋살장 우측 코트 -->
+          <rect    class="zone-shape risk-mid"  data-zone="5"  x="34.5" cy="26.6" width="7"    height="5.5" rx=".8" y="23.7"/>
+          <!-- ⑥ 교육농장: 상단 좌측 구역 -->
+          <rect    class="zone-shape risk-mid"  data-zone="6"  x="23.5" y="22.5"  width="9"    height="6.5" rx=".8"/>
+          <!-- ⑦ 텃밭체험장: 하단 좌측 -->
+          <rect    class="zone-shape risk-high" data-zone="7"  x="19.5" y="41.5"  width="7"    height="5.5" rx=".8"/>
+          <!-- ⑧ 피크닉장: 하단 중앙 -->
+          <rect    class="zone-shape risk-high" data-zone="8"  x="27"   y="41.5"  width="7.5"  height="5.5" rx=".8"/>
+          <!-- ⑨ 놀이터: 우측 중앙 -->
+          <rect    class="zone-shape risk-high" data-zone="9"  x="40"   y="30.5"  width="6.5"  height="5.5" rx=".8"/>
+          <!-- ⑩ 수변공간: 우측 하단 -->
+          <rect    class="zone-shape risk-high" data-zone="10" x="39"   y="41"    width="8"    height="5.5" rx=".8"/>
+          <!-- ⑪ 농업체험장: 최하단 중앙 -->
+          <rect    class="zone-shape risk-mid"  data-zone="11" x="28"   y="50"    width="14"   height="6.5" rx=".8"/>
+          <!-- ⑫ 주차장: 우측 상단 주차장 그리드 -->
+          <rect    class="zone-shape risk-mid"  data-zone="12" x="41"   y="14"    width="11"   height="9.5" rx=".8"/>
 
         </svg>
+        <!-- 호버 툴팁 -->
+        <div class="zone-tooltip" id="zone-tooltip"></div>
       </div>
 
       <!-- 구역 브리핑 드로어 -->
@@ -960,8 +983,9 @@ const ZONES = [
     modal:'traffic' },
 ];
 
-/* ── zone click handler ── */
+/* ── zone click + tooltip handler ── */
 const ZONE_COLORS = { high:'#c0392b', mid:'#e67e22', low:'#2d6a2d' };
+const tooltip = document.getElementById('zone-tooltip');
 
 document.querySelectorAll('.zone-shape').forEach(el => {
   el.addEventListener('click', function() {
@@ -971,7 +995,31 @@ document.querySelectorAll('.zone-shape').forEach(el => {
     this.classList.add('active');
     openDrawer(z);
   });
+
+  el.addEventListener('mouseenter', function(e) {
+    const zid = parseInt(this.dataset.zone);
+    const z   = ZONES.find(x => x.id === zid);
+    if (!z) return;
+    tooltip.textContent = z.emoji + ' ' + z.name;
+    tooltip.classList.add('show');
+    updateTooltipPos(e);
+  });
+
+  el.addEventListener('mousemove', updateTooltipPos);
+
+  el.addEventListener('mouseleave', function() {
+    tooltip.classList.remove('show');
+  });
 });
+
+function updateTooltipPos(e) {
+  const wrap = document.getElementById('map-img-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
 
 function openDrawer(z) {
   const drawer = document.getElementById('zone-drawer');
