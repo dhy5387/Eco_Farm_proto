@@ -280,6 +280,96 @@
     }
     .zoom-btn:hover { background:var(--green-light); border-color:var(--green-main); }
 
+    /* ── MAP PINS ── */
+    .map-pin-layer {
+      position:absolute; inset:0; pointer-events:none;
+    }
+    .map-pin {
+      position:absolute; transform:translate(-50%,-100%);
+      pointer-events:all; cursor:pointer;
+      display:flex; flex-direction:column; align-items:center;
+      transition:transform .15s ease;
+    }
+    .map-pin:hover { transform:translate(-50%,-100%) scale(1.15); z-index:10; }
+
+    .pin-bubble {
+      background:var(--green-main); color:#fff;
+      font-size:11px; font-weight:700;
+      padding:4px 9px; border-radius:20px;
+      white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3);
+      border:2px solid rgba(255,255,255,.6);
+    }
+    .pin-bubble.risk-high { background:#c0392b; }
+    .pin-bubble.risk-mid  { background:#e67e22; }
+    .pin-bubble.risk-low  { background:#2d6a2d; }
+
+    .pin-tail {
+      width:2px; height:10px;
+      background:inherit;
+    }
+    .pin-bubble.risk-high + .pin-tail { background:#c0392b; }
+    .pin-bubble.risk-mid  + .pin-tail { background:#e67e22; }
+    .pin-bubble.risk-low  + .pin-tail { background:#2d6a2d; }
+
+    .pin-dot {
+      width:8px; height:8px; border-radius:50%;
+      background:#fff; border:2px solid #333;
+      box-shadow:0 1px 4px rgba(0,0,0,.4);
+    }
+
+    /* ── MAP POPUP ── */
+    .map-popup {
+      position:absolute; z-index:20;
+      background:#fff; border-radius:14px;
+      box-shadow:0 8px 32px rgba(0,0,0,.25);
+      padding:16px 18px; width:240px;
+      pointer-events:all;
+      animation:popIn .2s ease;
+      border:1px solid var(--border);
+    }
+    @keyframes popIn { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+
+    .mp-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .mp-num {
+      width:28px; height:28px; border-radius:50%;
+      background:var(--green-main); color:#fff;
+      font-size:13px; font-weight:700;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .mp-name { font-size:15px; font-weight:700; }
+
+    .mp-risk {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:11px; font-weight:600;
+      padding:3px 9px; border-radius:12px;
+      margin-bottom:10px;
+    }
+    .mp-risk.risk-high { background:#fde8e8; color:#c0392b; }
+    .mp-risk.risk-mid  { background:#fef3e2; color:#d68910; }
+    .mp-risk.risk-low  { background:#e8f5e9; color:#1e7e34; }
+
+    .mp-types { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .mp-type {
+      font-size:11px; background:#f0f4e8; color:var(--text-mid);
+      border-radius:6px; padding:3px 8px;
+    }
+    .mp-btn {
+      width:100%; padding:8px; border-radius:8px;
+      background:var(--green-main); color:#fff;
+      border:none; cursor:pointer; font-size:13px; font-weight:600;
+      font-family:inherit; transition:background .2s;
+    }
+    .mp-btn:hover { background:var(--green-dark); }
+
+    .mp-close-btn {
+      position:absolute; top:10px; right:10px;
+      width:22px; height:22px; border-radius:6px;
+      border:none; background:#f0f0f0; cursor:pointer;
+      font-size:13px; display:flex; align-items:center; justify-content:center;
+      color:#999; transition:background .2s;
+    }
+    .mp-close-btn:hover { background:#ddd; }
+
     /* fullscreen overlay */
     .fs-overlay {
       position:fixed; inset:0; background:rgba(0,0,0,.88);
@@ -362,9 +452,10 @@
         <div class="map-badge">📍 주요 시설 12개소</div>
       </div>
 
-      <!-- 지도 이미지 -->
-      <div class="map-img-wrap" id="map-img-wrap">
-        <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" />
+      <!-- 지도 이미지 + 핀 레이어 -->
+      <div class="map-img-wrap" id="map-img-wrap" style="position:relative;">
+        <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" style="width:100%;display:block;" />
+        <div class="map-pin-layer" id="pin-layer"></div>
       </div>
 
       <!-- 하단 바 -->
@@ -694,6 +785,150 @@ function onOverlayClick(e) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeFullscreen(); }
 });
+
+/* ── MAP PINS ── */
+const FACILITIES = [
+  {
+    num:1, name:'잔디마당', left:28.5, top:52,
+    risk:'low', riskLabel:'저위험',
+    rate:2.8, types:['낙상','충돌사고','실신'],
+    desc:'주요 행사·피크닉 공간. 혼잡 시 낙상·충돌 주의.',
+    dataId: null,
+  },
+  {
+    num:2, name:'방문자센터', left:18.5, top:46,
+    risk:'low', riskLabel:'저위험',
+    rate:2.9, types:['교통사고','미아','실신'],
+    desc:'입구 주요 동선. 미아·교통사고 발생 집중 구역.',
+    dataId:'traffic',
+  },
+  {
+    num:3, name:'카페테리아', left:20.5, top:57,
+    risk:'high', riskLabel:'고위험',
+    rate:16.4, types:['식중독','알레르기'],
+    desc:'음식 제공 공간. 식중독·알레르기 집중 관리 필요.',
+    dataId:'food',
+  },
+  {
+    num:4, name:'풋살장', left:30, top:43,
+    risk:'mid', riskLabel:'중위험',
+    rate:8.5, types:['골절','낙상','충돌사고'],
+    desc:'스포츠 시설. 격렬한 운동으로 골절·낙상 빈발.',
+    dataId:'fracture',
+  },
+  {
+    num:5, name:'테니스장', left:35.5, top:37,
+    risk:'mid', riskLabel:'중위험',
+    rate:7.2, types:['낙상','골절','실신'],
+    desc:'스포츠 시설. 무리한 운동 시 실신·낙상 주의.',
+    dataId:'fall',
+  },
+  {
+    num:6, name:'교육농장', left:26, top:29,
+    risk:'mid', riskLabel:'중위험',
+    rate:9.2, types:['동물물림','알레르기','열사병'],
+    desc:'동물 접촉 체험 구역. 물림 사고·알레르기 주의.',
+    dataId:'animal',
+  },
+  {
+    num:7, name:'텃밭체험장', left:26.5, top:66,
+    risk:'high', riskLabel:'고위험',
+    rate:11.1, types:['동물물림','알레르기','열사병'],
+    desc:'야외 체험 공간. 여름철 열사병·알레르기 다발.',
+    dataId:'heatstroke',
+  },
+  {
+    num:8, name:'피크닉장', left:35, top:63,
+    risk:'high', riskLabel:'고위험',
+    rate:14.4, types:['낙상','식중독','화상'],
+    desc:'캠프파이어 구역 인접. 화상·식중독 집중 발생.',
+    dataId:'burn',
+  },
+  {
+    num:9, name:'놀이터', left:42, top:53,
+    risk:'high', riskLabel:'고위험',
+    rate:16.7, types:['낙상','골절','충돌사고','심정지'],
+    desc:'어린이 이용 시설. 낙상·골절 발생률 최고 구역.',
+    dataId:'fall',
+  },
+  {
+    num:10, name:'수변공간', left:39, top:71,
+    risk:'high', riskLabel:'고위험',
+    rate:12.3, types:['익수','낙상','심정지'],
+    desc:'수변 접근 구역. 익수 및 낙상 사고 고위험 지대.',
+    dataId:'cardiac',
+  },
+  {
+    num:11, name:'농업체험장', left:25.5, top:80,
+    risk:'mid', riskLabel:'중위험',
+    rate:7.9, types:['동물물림','알레르기','낙상'],
+    desc:'농기계·동물 접촉 구역. 물림·알레르기 주의.',
+    dataId:'animal',
+  },
+  {
+    num:12, name:'주차장', left:43.5, top:27,
+    risk:'mid', riskLabel:'중위험',
+    rate:9.5, types:['교통사고','미아'],
+    desc:'차량 출입 구역. 교통사고·미아 발생 주요 지점.',
+    dataId:'traffic',
+  },
+];
+
+(function renderPins() {
+  const layer = document.getElementById('pin-layer');
+  FACILITIES.forEach(f => {
+    const pin = document.createElement('div');
+    pin.className = 'map-pin';
+    pin.style.left = f.left + '%';
+    pin.style.top  = f.top  + '%';
+    pin.dataset.id = f.num;
+    pin.innerHTML = `
+      <div class="pin-bubble risk-${f.risk}">⑩</div>
+      <div class="pin-tail"></div>
+      <div class="pin-dot"></div>`;
+    // 번호 원문자
+    const nums = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫'];
+    pin.querySelector('.pin-bubble').textContent = nums[f.num-1];
+    pin.addEventListener('click', e => { e.stopPropagation(); showMapPopup(f, pin); });
+    layer.appendChild(pin);
+  });
+  layer.addEventListener('click', () => removeMapPopup());
+})();
+
+let activePopup = null;
+
+function showMapPopup(f, pin) {
+  removeMapPopup();
+  const layer  = document.getElementById('pin-layer');
+  const popup  = document.createElement('div');
+  popup.className = 'map-popup';
+  popup.innerHTML = `
+    <button class="mp-close-btn" onclick="removeMapPopup()">✕</button>
+    <div class="mp-head">
+      <div class="mp-num">${f.num}</div>
+      <div class="mp-name">${f.name}</div>
+    </div>
+    <div class="mp-risk risk-${f.risk}">
+      ⚠️ ${f.riskLabel} &nbsp;·&nbsp; 발생률 ${f.rate}%
+    </div>
+    <div class="mp-types">
+      ${f.types.map(t=>`<span class="mp-type">${t}</span>`).join('')}
+    </div>
+    <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;line-height:1.55">${f.desc}</p>
+    ${f.dataId ? `<button class="mp-btn" onclick="openModal('${f.dataId}');removeMapPopup()">📋 대응 매뉴얼 보기</button>` : ''}`;
+
+  // 팝업 위치 — 핀 기준으로 오른쪽 or 왼쪽
+  const pinL = parseFloat(f.left);
+  popup.style.top  = Math.max(2, f.top - 28) + '%';
+  popup.style.left = pinL > 38 ? (pinL - 24) + '%' : (pinL + 3) + '%';
+
+  layer.appendChild(popup);
+  activePopup = popup;
+}
+
+function removeMapPopup() {
+  if (activePopup) { activePopup.remove(); activePopup = null; }
+}
 
 /* ── fullscreen map ── */
 function openFullscreen()  { document.getElementById('fs-overlay').classList.add('open');    document.body.style.overflow='hidden'; }
