@@ -479,57 +479,61 @@
       <!-- 지도 이미지 + 구역 SVG 오버레이 -->
       <div class="map-img-wrap" id="map-img-wrap" style="position:relative;">
         <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" style="width:100%;display:block;" />
-        <!-- SVG 좌표: viewBox="0 0 100 100" — x=이미지 너비%, y=이미지 높이% (1:1 매핑) -->
+        <!-- SVG 좌표: viewBox="0 0 100 100" — x=이미지 너비%, y=이미지 높이% (빨간선 기준) -->
         <svg class="zone-svg" id="zone-svg"
              viewBox="0 0 100 100" preserveAspectRatio="none">
 
-          <!-- ① 잔디마당: 중앙 타원형 잔디밭 -->
-          <ellipse class="zone-shape risk-low"  data-zone="1"
-                   cx="27" cy="52" rx="7" ry="8.5"/>
+          <!-- ① 잔디마당: 중앙 녹색 잔디 구역 -->
+          <rect    class="zone-shape risk-low"  data-zone="1"
+                   x="21" y="40" width="17" height="22" rx="2"/>
 
-          <!-- ② 방문자센터: 좌측 L형 청색 건물 -->
+          <!-- ② 방문자센터: 좌측 청색 건물 -->
           <polygon class="zone-shape risk-low"  data-zone="2"
-                   points="10,44 21,44 21,52 17,52 17,57 10,57"/>
+                   points="13,46.5 19.7,46.5 19.7,55.5 13,55.5"/>
 
           <!-- ③ 카페테리아: 방문자센터 하단 건물 -->
           <polygon class="zone-shape risk-high" data-zone="3"
-                   points="14,55 23,55 23,64 14,64"/>
+                   points="15,54 21,54 21,60 15,60"/>
 
-          <!-- ④ 풋살장: 상단 중앙 블루 코트 -->
-          <rect    class="zone-shape risk-mid"  data-zone="4"
-                   x="28" y="38" width="10" height="11" rx="1"/>
+          <!-- ④ 풋살장: 중앙 블루 코트 -->
+          <polygon class="zone-shape risk-mid"  data-zone="4"
+                   points="29,45 35.7,45 35.7,60 29,60"/>
 
-          <!-- ⑤ 테니스장: 풋살장 우측 코트들 -->
+          <!-- ⑤ 테니스장: ④ 우측 코트들 (더 좁고 긴 형태) -->
           <polygon class="zone-shape risk-mid"  data-zone="5"
-                   points="33,31 47,31 47,43 33,43"/>
+                   points="35.7,37.5 40.4,37.5 40.4,60 35.7,60"/>
 
-          <!-- ⑥ 교육농장: 상단 중앙 농장 구획 -->
+          <!-- ⑥ 교육농장: 상단 넓은 농장 구획 (④⑤① 위쪽) -->
           <polygon class="zone-shape risk-mid"  data-zone="6"
-                   points="22,28 35,28 36,40 22,41"/>
+                   points="15.7,16.5 36.4,16.5 36.4,38 35.7,37.5 21,40 15.7,38"/>
 
-          <!-- ⑦ 텃밭체험장: 하단 좌측 텃밭 -->
+          <!-- ⑦ 텃밭체험장: ① 아래 중앙 텃밭 -->
           <polygon class="zone-shape risk-high" data-zone="7"
-                   points="19,58 29,58 28,68 18,68"/>
+                   points="25.7,62.5 35,62.5 35,73 25.7,73"/>
 
-          <!-- ⑧ 피크닉장: 하단 중앙 원형 공간 -->
-          <ellipse class="zone-shape risk-high" data-zone="8"
-                   cx="31" cy="63" rx="6.5" ry="5.5"/>
+          <!-- ⑧ 피크닉장: 원형 피크닉 광장 (유기적 형태) -->
+          <polygon class="zone-shape risk-high" data-zone="8"
+                   points="35,61 41.5,60 43,68.5 40,73.5 35,72.5 33.5,67"/>
 
-          <!-- ⑨ 놀이터: 우측 중앙 타원 놀이터 -->
-          <ellipse class="zone-shape risk-high" data-zone="9"
-                   cx="43.5" cy="48" rx="5.5" ry="6.5"/>
+          <!-- ⑨ 놀이터: 우측 원형 구조물 -->
+          <polygon class="zone-shape risk-high" data-zone="9"
+                   points="44,41 50,40.5 51.5,50 46,55.5 43.5,50"/>
 
-          <!-- ⑩ 수변공간: 우측 하단 수변 구역 -->
+          <!-- ⑨ 놀이터: 좌측 하단 넓은 야외 놀이 구역 -->
+          <polygon class="zone-shape risk-high" data-zone="9"
+                   points="7,60 20,60 21,80 7,85"/>
+
+          <!-- ⑩ 수변공간: 우측 하단 수변 시설 -->
           <polygon class="zone-shape risk-high" data-zone="10"
-                   points="38,58 50,57 51,70 37,71"/>
+                   points="46,65 54,64 54,74 50,78 46,71"/>
 
-          <!-- ⑪ 농업체험장: 최하단 넓은 농업 구역 -->
+          <!-- ⑪ 농업체험장: 하단 넓은 농업 체험 구역 -->
           <polygon class="zone-shape risk-mid"  data-zone="11"
-                   points="26,71 47,71 47,83 25,83"/>
+                   points="22,77 51,77 51,89 22,89"/>
 
-          <!-- ⑫ 주차장: 우측 상단 주차장 그리드 -->
+          <!-- ⑫ 오토캠핑장: 우측 상단 캠핑 구역 -->
           <polygon class="zone-shape risk-mid"  data-zone="12"
-                   points="40,19 54,19 55,35 40,35"/>
+                   points="36.4,16.5 54,16.5 54,38 36.4,38"/>
 
         </svg>
         <!-- 호버 툴팁 -->
@@ -992,16 +996,16 @@ const ZONES = [
     action:'AED까지 거리가 가장 먼 구역 — 심정지 발생 시 CPR 즉시 시작하며 동시에 119 신고',
     modal:'animal' },
 
-  { id:12, name:'주차장',    emoji:'🅿️', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
-    position:'파크 동북쪽 — 주 차량 진입로 인접',
-    desc:'대형 주차 구역 및 버스 정류장. 차량 이동이 빈번하여 교통사고·미아 발생 주요 지점입니다.',
-    capacity:'차량 약 300대', area:'약 9,000㎡',
-    types:['교통사고','미아','실신'], rate:9.5,
-    aed:'주차장 안전초소 (상시 비치)',
-    staff:'주차 안내원 2명, 안전요원 1명',
-    checks:['보행자 동선과 차량 동선 완전 분리 확인','어린이 보호구역 속도 제한 (10km/h) 표지 점검','야간 조명 상태 매일 확인'],
-    action:'교통사고 시 즉시 119·112 신고, 차량 시동 끄고 2차 사고 방지 후 부상자 이동 금지',
-    modal:'traffic' },
+  { id:12, name:'오토캠핑장', emoji:'🏕️', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
+    position:'파크 북동쪽 — 오토캠핑 전용 구역',
+    desc:'차량 동반 오토캠핑 구역. 텐트·차박 방문객이 밀집하며 야간 취침 중 응급상황 대응이 중요한 구역입니다.',
+    capacity:'약 120대 (캠핑 사이트)', area:'약 12,000㎡',
+    types:['화재','가스중독','저체온증','교통사고'], rate:8.7,
+    aed:'캠핑장 입구 안전초소 (상시 비치)',
+    staff:'캠핑장 관리인 1명, 야간 안전요원 1명',
+    checks:['화기 및 취사 장비 사용 규정 안내 (입장 시)','가스버너·랜턴 안전 사용 교육','야간 차량 이동 속도 제한(10km/h) 확인','우천·강풍 시 텐트 고정 상태 점검'],
+    action:'캠핑 화재 시 즉시 119 신고 후 소화기 사용, 가스 중독 의심 시 신선한 공기 노출 후 119, 저체온 시 보온 처치',
+    modal:'burn' },
 ];
 
 /* ── zone click + tooltip handler ── */
