@@ -210,9 +210,11 @@
     .modal {
       background:#fff; border-radius:24px;
       width:100%; max-width:680px; max-height:88vh;
-      overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,.3);
+      display:flex; flex-direction:column;
+      overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.3);
       animation:slideUp .28s ease;
     }
+    .m-body { overflow-y:auto; flex:1; }
     @keyframes slideUp { from{transform:translateY(28px);opacity:0} to{transform:translateY(0);opacity:1} }
 
     .m-head {
@@ -241,7 +243,24 @@
     }
     .m-close:hover { background:#e8e8e8; }
 
-    .m-body { padding:24px 32px 36px; }
+    .m-body { padding:24px 32px 28px; }
+    .m-footer {
+      padding:16px 32px 20px;
+      border-top:2px solid #f0f0f0;
+      background:#fff;
+      border-radius:0 0 24px 24px;
+      flex-shrink:0;
+    }
+    .btn-call-staff {
+      width:100%; padding:14px;
+      background:#c0392b; color:#fff; border:none;
+      border-radius:12px; font-size:15px; font-weight:700;
+      cursor:pointer; display:flex; align-items:center;
+      justify-content:center; gap:8px;
+      transition:opacity .2s;
+    }
+    .btn-call-staff:hover  { opacity:.87; }
+    .btn-call-staff:disabled { opacity:.55; cursor:default; }
     .m-sec { margin-bottom:26px; }
     .m-sec-title {
       font-size:12px; font-weight:700; color:var(--green-main);
@@ -659,6 +678,11 @@
       <button class="m-close" onclick="closeModal()">✕</button>
     </div>
     <div class="m-body" id="m-body"></div>
+    <div class="m-footer">
+      <button class="btn-call-staff" id="modal-call-btn" onclick="callStaff()">
+        📢 직원 호출
+      </button>
+    </div>
   </div>
 </div>
 
@@ -977,12 +1001,11 @@ function openModal(id) {
     <div class="m-sec">
       <div class="m-sec-title">주의 사항</div>
       <div class="alert-box">⚠️ ${e.alert}</div>
-    </div>
-    <div class="m-sec" style="border-top:2px solid #f0f0f0;padding-top:20px;margin-top:4px">
-      <button class="btn-call" id="modal-call-btn" onclick="callStaff()" style="width:100%;justify-content:center;font-size:15px;padding:14px">
-        📢 직원 호출
-      </button>
     </div>`;
+
+  const callBtn = document.getElementById('modal-call-btn');
+  callBtn.textContent = '📢 직원 호출';
+  callBtn.disabled = false;
 
   document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
