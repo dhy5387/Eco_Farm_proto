@@ -280,95 +280,118 @@
     }
     .zoom-btn:hover { background:var(--green-light); border-color:var(--green-main); }
 
-    /* ── MAP PINS ── */
-    .map-pin-layer {
-      position:absolute; inset:0; pointer-events:none;
+    /* ── ZONE SVG OVERLAY ── */
+    .zone-svg {
+      position:absolute; inset:0; width:100%; height:100%;
+      pointer-events:none;
     }
-    .map-pin {
-      position:absolute; transform:translate(-50%,-100%);
-      pointer-events:all; cursor:pointer;
-      display:flex; flex-direction:column; align-items:center;
-      transition:transform .15s ease;
+    .zone-shape {
+      fill:transparent; stroke:transparent;
+      cursor:pointer; pointer-events:all;
+      transition:fill .18s, stroke .18s;
     }
-    .map-pin:hover { transform:translate(-50%,-100%) scale(1.15); z-index:10; }
+    .zone-shape:hover       { fill:rgba(232,196,74,.28); stroke:rgba(232,196,74,.9); stroke-width:.5; }
+    .zone-shape.risk-high:hover { fill:rgba(192,57,43,.22);  stroke:rgba(192,57,43,.85);  }
+    .zone-shape.risk-mid:hover  { fill:rgba(230,126,34,.22); stroke:rgba(230,126,34,.85); }
+    .zone-shape.risk-low:hover  { fill:rgba(45,106,45,.22);  stroke:rgba(45,106,45,.85);  }
+    .zone-shape.active      { stroke-width:.6; }
+    .zone-shape.active.risk-high { fill:rgba(192,57,43,.3);  stroke:rgba(192,57,43,1); }
+    .zone-shape.active.risk-mid  { fill:rgba(230,126,34,.3); stroke:rgba(230,126,34,1); }
+    .zone-shape.active.risk-low  { fill:rgba(45,106,45,.3);  stroke:rgba(45,106,45,1); }
 
-    .pin-bubble {
-      background:var(--green-main); color:#fff;
-      font-size:11px; font-weight:700;
-      padding:4px 9px; border-radius:20px;
-      white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.3);
-      border:2px solid rgba(255,255,255,.6);
-    }
-    .pin-bubble.risk-high { background:#c0392b; }
-    .pin-bubble.risk-mid  { background:#e67e22; }
-    .pin-bubble.risk-low  { background:#2d6a2d; }
-
-    .pin-tail {
-      width:2px; height:10px;
-      background:inherit;
-    }
-    .pin-bubble.risk-high + .pin-tail { background:#c0392b; }
-    .pin-bubble.risk-mid  + .pin-tail { background:#e67e22; }
-    .pin-bubble.risk-low  + .pin-tail { background:#2d6a2d; }
-
-    .pin-dot {
-      width:8px; height:8px; border-radius:50%;
-      background:#fff; border:2px solid #333;
-      box-shadow:0 1px 4px rgba(0,0,0,.4);
+    .zone-label {
+      font-size:1.8px; font-weight:700; fill:#fff;
+      text-anchor:middle; dominant-baseline:middle;
+      pointer-events:none;
+      paint-order:stroke; stroke:#000; stroke-width:.6px;
+      stroke-linejoin:round;
     }
 
-    /* ── MAP POPUP ── */
-    .map-popup {
-      position:absolute; z-index:20;
-      background:#fff; border-radius:14px;
-      box-shadow:0 8px 32px rgba(0,0,0,.25);
-      padding:16px 18px; width:240px;
-      pointer-events:all;
-      animation:popIn .2s ease;
-      border:1px solid var(--border);
+    /* ── ZONE BRIEFING DRAWER ── */
+    .zone-drawer {
+      display:none; background:#fff;
+      border-top:3px solid var(--zone-color, var(--green-main));
+      border-radius:0 0 16px 16px;
+      animation:drawerIn .28s ease;
     }
-    @keyframes popIn { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+    .zone-drawer.open { display:block; }
+    @keyframes drawerIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
 
-    .mp-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .mp-num {
-      width:28px; height:28px; border-radius:50%;
-      background:var(--green-main); color:#fff;
-      font-size:13px; font-weight:700;
+    .drawer-inner { padding:24px 28px 28px; }
+
+    .drawer-head {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      margin-bottom:18px;
+    }
+    .drawer-left { display:flex; align-items:center; gap:14px; }
+    .drawer-num {
+      width:40px; height:40px; border-radius:12px;
+      background:var(--zone-color, var(--green-main)); color:#fff;
+      font-size:18px; font-weight:700;
       display:flex; align-items:center; justify-content:center; flex-shrink:0;
     }
-    .mp-name { font-size:15px; font-weight:700; }
-
-    .mp-risk {
+    .drawer-title h3 { font-size:19px; font-weight:700; margin-bottom:4px; }
+    .drawer-title p  { font-size:13px; color:var(--text-light); }
+    .drawer-risk {
       display:inline-flex; align-items:center; gap:5px;
-      font-size:11px; font-weight:600;
-      padding:3px 9px; border-radius:12px;
-      margin-bottom:10px;
+      font-size:12px; font-weight:700;
+      padding:5px 13px; border-radius:20px;
     }
-    .mp-risk.risk-high { background:#fde8e8; color:#c0392b; }
-    .mp-risk.risk-mid  { background:#fef3e2; color:#d68910; }
-    .mp-risk.risk-low  { background:#e8f5e9; color:#1e7e34; }
+    .drawer-risk.risk-high { background:#fde8e8; color:#c0392b; }
+    .drawer-risk.risk-mid  { background:#fef3e2; color:#d68910; }
+    .drawer-risk.risk-low  { background:#e8f5e9; color:#1e7e34; }
 
-    .mp-types { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
-    .mp-type {
-      font-size:11px; background:#f0f4e8; color:var(--text-mid);
-      border-radius:6px; padding:3px 8px;
+    .drawer-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+      gap:12px; margin-bottom:18px;
     }
-    .mp-btn {
-      width:100%; padding:8px; border-radius:8px;
-      background:var(--green-main); color:#fff;
-      border:none; cursor:pointer; font-size:13px; font-weight:600;
-      font-family:inherit; transition:background .2s;
+    .drawer-cell {
+      background:var(--bg); border-radius:10px; padding:12px 14px;
     }
-    .mp-btn:hover { background:var(--green-dark); }
+    .drawer-cell-label {
+      font-size:11px; font-weight:700; color:var(--text-light);
+      margin-bottom:5px; text-transform:uppercase; letter-spacing:.4px;
+    }
+    .drawer-cell-val { font-size:13px; color:var(--text-dark); line-height:1.55; }
 
-    .mp-close-btn {
-      position:absolute; top:10px; right:10px;
-      width:22px; height:22px; border-radius:6px;
-      border:none; background:#f0f0f0; cursor:pointer;
-      font-size:13px; display:flex; align-items:center; justify-content:center;
-      color:#999; transition:background .2s;
+    .drawer-types { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px; }
+    .drawer-type {
+      font-size:12px; font-weight:600;
+      padding:4px 10px; border-radius:8px;
+      background:#f0f4e8; color:var(--text-mid);
     }
-    .mp-close-btn:hover { background:#ddd; }
+
+    .drawer-checks { list-style:none; display:flex; flex-direction:column; gap:7px; margin-bottom:18px; }
+    .drawer-check  { display:flex; align-items:flex-start; gap:8px; font-size:13px; }
+    .drawer-check::before {
+      content:'⚡'; flex-shrink:0; margin-top:1px;
+    }
+
+    .drawer-action {
+      background:#fff8e8; border:1px solid #f0d870;
+      border-left:4px solid var(--zone-color, var(--gold-dark));
+      border-radius:10px; padding:12px 14px;
+      font-size:13px; color:#7a5c00; line-height:1.6;
+      margin-bottom:18px;
+    }
+
+    .drawer-btns { display:flex; gap:10px; flex-wrap:wrap; }
+    .drawer-btn-primary {
+      flex:1; min-width:140px; padding:10px 16px;
+      background:var(--zone-color, var(--green-main)); color:#fff;
+      border:none; border-radius:10px; cursor:pointer;
+      font-size:13px; font-weight:700; font-family:inherit;
+      transition:opacity .2s;
+    }
+    .drawer-btn-primary:hover { opacity:.85; }
+    .drawer-btn-close {
+      padding:10px 16px;
+      background:#f0f4e8; color:var(--text-mid);
+      border:1px solid var(--border); border-radius:10px; cursor:pointer;
+      font-size:13px; font-weight:600; font-family:inherit;
+      transition:background .2s;
+    }
+    .drawer-btn-close:hover { background:var(--green-light); }
 
     /* fullscreen overlay */
     .fs-overlay {
@@ -452,10 +475,79 @@
         <div class="map-badge">📍 주요 시설 12개소</div>
       </div>
 
-      <!-- 지도 이미지 + 핀 레이어 -->
+      <!-- 지도 이미지 + 구역 SVG 오버레이 -->
       <div class="map-img-wrap" id="map-img-wrap" style="position:relative;">
         <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" style="width:100%;display:block;" />
-        <div class="map-pin-layer" id="pin-layer"></div>
+        <!-- SVG 구역 레이어: viewBox는 이미지 비율(100x70) 기반 -->
+        <svg class="zone-svg" id="zone-svg"
+             viewBox="0 0 100 70" preserveAspectRatio="none">
+
+          <!-- ① 잔디마당 -->
+          <ellipse class="zone-shape risk-low" data-zone="1"
+            cx="29" cy="38" rx="8" ry="8.5" />
+          <text class="zone-label" x="29" y="38">①잔디마당</text>
+
+          <!-- ② 방문자센터 -->
+          <rect class="zone-shape risk-low" data-zone="2"
+            x="13.5" y="27" width="7.5" height="10" rx=".8"/>
+          <text class="zone-label" x="17.3" y="32.5">②방문자센터</text>
+
+          <!-- ③ 카페테리아 -->
+          <rect class="zone-shape risk-high" data-zone="3"
+            x="15.5" y="37.5" width="7" height="7.5" rx=".8"/>
+          <text class="zone-label" x="19" y="41.5">③카페테리아</text>
+
+          <!-- ④ 풋살장 -->
+          <rect class="zone-shape risk-mid" data-zone="4"
+            x="25.5" y="24.5" width="8" height="9" rx=".8"/>
+          <text class="zone-label" x="29.5" y="29.5">④풋살장</text>
+
+          <!-- ⑤ 테니스장 -->
+          <rect class="zone-shape risk-mid" data-zone="5"
+            x="31" y="18.5" width="9.5" height="9.5" rx=".8"/>
+          <text class="zone-label" x="35.8" y="23.5">⑤테니스장</text>
+
+          <!-- ⑥ 교육농장 -->
+          <rect class="zone-shape risk-mid" data-zone="6"
+            x="20" y="12" width="11" height="11" rx=".8"/>
+          <text class="zone-label" x="25.5" y="17.8">⑥교육농장</text>
+
+          <!-- ⑦ 텃밭체험장 -->
+          <rect class="zone-shape risk-high" data-zone="7"
+            x="20.5" y="42" width="9.5" height="9.5" rx=".8"/>
+          <text class="zone-label" x="25.3" y="47">⑦텃밭체험장</text>
+
+          <!-- ⑧ 피크닉장 -->
+          <rect class="zone-shape risk-high" data-zone="8"
+            x="30" y="41" width="11" height="9.5" rx=".8"/>
+          <text class="zone-label" x="35.5" y="46">⑧피크닉장</text>
+
+          <!-- ⑨ 놀이터 -->
+          <rect class="zone-shape risk-high" data-zone="9"
+            x="38" y="31" width="10.5" height="11" rx=".8"/>
+          <text class="zone-label" x="43.3" y="37">⑨놀이터</text>
+
+          <!-- ⑩ 수변공간 -->
+          <rect class="zone-shape risk-high" data-zone="10"
+            x="34" y="47.5" width="11" height="10" rx=".8"/>
+          <text class="zone-label" x="39.5" y="53">⑩수변공간</text>
+
+          <!-- ⑪ 농업체험장 -->
+          <rect class="zone-shape risk-mid" data-zone="11"
+            x="17" y="50" width="10.5" height="11" rx=".8"/>
+          <text class="zone-label" x="22.3" y="56">⑪농업체험장</text>
+
+          <!-- ⑫ 주차장 -->
+          <rect class="zone-shape risk-mid" data-zone="12"
+            x="38.5" y="10" width="15" height="11" rx=".8"/>
+          <text class="zone-label" x="46" y="16">⑫주차장</text>
+
+        </svg>
+      </div>
+
+      <!-- 구역 브리핑 드로어 -->
+      <div class="zone-drawer" id="zone-drawer">
+        <div class="drawer-inner" id="drawer-inner"></div>
       </div>
 
       <!-- 하단 바 -->
@@ -786,148 +878,223 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeFullscreen(); }
 });
 
-/* ── MAP PINS ── */
-const FACILITIES = [
-  {
-    num:1, name:'잔디마당', left:28.5, top:52,
-    risk:'low', riskLabel:'저위험',
-    rate:2.8, types:['낙상','충돌사고','실신'],
-    desc:'주요 행사·피크닉 공간. 혼잡 시 낙상·충돌 주의.',
-    dataId: null,
-  },
-  {
-    num:2, name:'방문자센터', left:18.5, top:46,
-    risk:'low', riskLabel:'저위험',
-    rate:2.9, types:['교통사고','미아','실신'],
-    desc:'입구 주요 동선. 미아·교통사고 발생 집중 구역.',
-    dataId:'traffic',
-  },
-  {
-    num:3, name:'카페테리아', left:20.5, top:57,
-    risk:'high', riskLabel:'고위험',
-    rate:16.4, types:['식중독','알레르기'],
-    desc:'음식 제공 공간. 식중독·알레르기 집중 관리 필요.',
-    dataId:'food',
-  },
-  {
-    num:4, name:'풋살장', left:30, top:43,
-    risk:'mid', riskLabel:'중위험',
-    rate:8.5, types:['골절','낙상','충돌사고'],
-    desc:'스포츠 시설. 격렬한 운동으로 골절·낙상 빈발.',
-    dataId:'fracture',
-  },
-  {
-    num:5, name:'테니스장', left:35.5, top:37,
-    risk:'mid', riskLabel:'중위험',
-    rate:7.2, types:['낙상','골절','실신'],
-    desc:'스포츠 시설. 무리한 운동 시 실신·낙상 주의.',
-    dataId:'fall',
-  },
-  {
-    num:6, name:'교육농장', left:26, top:29,
-    risk:'mid', riskLabel:'중위험',
-    rate:9.2, types:['동물물림','알레르기','열사병'],
-    desc:'동물 접촉 체험 구역. 물림 사고·알레르기 주의.',
-    dataId:'animal',
-  },
-  {
-    num:7, name:'텃밭체험장', left:26.5, top:66,
-    risk:'high', riskLabel:'고위험',
-    rate:11.1, types:['동물물림','알레르기','열사병'],
-    desc:'야외 체험 공간. 여름철 열사병·알레르기 다발.',
-    dataId:'heatstroke',
-  },
-  {
-    num:8, name:'피크닉장', left:35, top:63,
-    risk:'high', riskLabel:'고위험',
-    rate:14.4, types:['낙상','식중독','화상'],
-    desc:'캠프파이어 구역 인접. 화상·식중독 집중 발생.',
-    dataId:'burn',
-  },
-  {
-    num:9, name:'놀이터', left:42, top:53,
-    risk:'high', riskLabel:'고위험',
-    rate:16.7, types:['낙상','골절','충돌사고','심정지'],
-    desc:'어린이 이용 시설. 낙상·골절 발생률 최고 구역.',
-    dataId:'fall',
-  },
-  {
-    num:10, name:'수변공간', left:39, top:71,
-    risk:'high', riskLabel:'고위험',
-    rate:12.3, types:['익수','낙상','심정지'],
-    desc:'수변 접근 구역. 익수 및 낙상 사고 고위험 지대.',
-    dataId:'cardiac',
-  },
-  {
-    num:11, name:'농업체험장', left:25.5, top:80,
-    risk:'mid', riskLabel:'중위험',
-    rate:7.9, types:['동물물림','알레르기','낙상'],
-    desc:'농기계·동물 접촉 구역. 물림·알레르기 주의.',
-    dataId:'animal',
-  },
-  {
-    num:12, name:'주차장', left:43.5, top:27,
-    risk:'mid', riskLabel:'중위험',
-    rate:9.5, types:['교통사고','미아'],
-    desc:'차량 출입 구역. 교통사고·미아 발생 주요 지점.',
-    dataId:'traffic',
-  },
+/* ── ZONE BRIEFING DATA ── */
+const ZONES = [
+  { id:1,  name:'잔디마당',   emoji:'🌿', color:'#2d6a2d', risk:'low',  riskLabel:'저위험',
+    position:'파크 정중앙 — 주 진입로 북쪽',
+    desc:'에코팜의 핵심 광장. 계절별 축제·공연·피크닉이 열리는 다목적 잔디 광장입니다.',
+    capacity:'약 500명', area:'약 8,000㎡',
+    types:['낙상','충돌사고','실신'], rate:2.8,
+    aed:'② 방문자센터 입구 (약 150m)',
+    staff:'안전요원 2명 상시 배치',
+    checks:['야외 행사 시 군중 밀집 구역 통제','우천 후 잔디 미끄러움 사전 점검','피크 시간(13시·15시) 밀집도 실시간 모니터링'],
+    action:'낙상·충돌 발생 시 환자 이동 금지, 현장 안정 후 119 신고',
+    modal:null },
+
+  { id:2,  name:'방문자센터', emoji:'🏢', color:'#2980b9', risk:'low',  riskLabel:'저위험',
+    position:'파크 서쪽 주 입구 — 버스정류장 인접',
+    desc:'방문객 안내·물품 보관·응급처치 키트 비치 공간. 파크 내 핵심 거점 시설입니다.',
+    capacity:'약 100명', area:'건축면적 약 800㎡',
+    types:['미아','실신','교통사고'], rate:2.9,
+    aed:'방문자센터 내부 로비 (상시 비치)',
+    staff:'안내 직원 3명, 안전요원 1명',
+    checks:['입장 시 아동 미아 방지 팔찌 배부','방문자 응급처치 키트 재고 매일 확인','CCTV 모니터 24시간 운영'],
+    action:'미아 발생 즉시 방내 방송 후 주 출입구 통제 → 30분 이내 미발견 시 112 신고',
+    modal:'lost' },
+
+  { id:3,  name:'카페테리아', emoji:'☕', color:'#c0392b', risk:'high', riskLabel:'고위험',
+    position:'방문자센터 남쪽 인접 — 파크 서측',
+    desc:'방문객 식음료 제공 공간. 위생 관리가 핵심이며 식중독·알레르기 집중 발생 구역입니다.',
+    capacity:'약 120명', area:'약 350㎡',
+    types:['식중독','알레르기','실신'], rate:16.4,
+    aed:'② 방문자센터 내부 (약 60m)',
+    staff:'위생 담당 1명, 응급처치 요원 1명',
+    checks:['식재료 냉장 보관 온도 매일 기록','조리 기구 소독 및 위생 점검 주 1회','알레르기 유발 식품 메뉴판 표기 필수'],
+    action:'식중독 집단 발생 시 원인 음식 즉시 봉인 후 보건소(1399) 신고, 구토 유발 금지',
+    modal:'food' },
+
+  { id:4,  name:'풋살장',    emoji:'⚽', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
+    position:'잔디마당 북서쪽 — 교육농장 남측',
+    desc:'야외 풋살 전용 코트. 격렬한 신체 접촉 스포츠로 골절·낙상 발생 빈도가 높습니다.',
+    capacity:'약 22명 (1코트)', area:'약 800㎡',
+    types:['골절','낙상','충돌사고'], rate:8.5,
+    aed:'② 방문자센터 (약 200m)',
+    staff:'안전요원 1명 경기 시 상주',
+    checks:['경기 전 코트 상태(파손·이물질) 점검','적절한 보호장구 착용 안내','어린이와 성인 혼합 경기 금지'],
+    action:'골절 의심 시 부목 고정 후 이동, 개방성 골절 즉시 119 신고',
+    modal:'fracture' },
+
+  { id:5,  name:'테니스장',  emoji:'🎾', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
+    position:'잔디마당 북쪽 — 주차장⑫ 서측',
+    desc:'야외 테니스 코트. 장시간 운동 시 실신·낙상 위험이 있으며 여름철 열사병 주의구역입니다.',
+    capacity:'약 8명 (1코트)', area:'약 700㎡',
+    types:['낙상','실신','열사병'], rate:7.2,
+    aed:'⑫ 주차장 안전초소 (약 120m)',
+    staff:'경기 시간대 안전요원 1명',
+    checks:['여름철 코트 온도 확인 (하드코트 표면 60°C 이상 위험)','운동 전 충분한 준비운동 안내','수분 보충 및 휴식 시간 권고'],
+    action:'실신 발생 시 서늘한 그늘로 이동, 다리 심장보다 높게 올리고 119 신고',
+    modal:'faint' },
+
+  { id:6,  name:'교육농장',  emoji:'🌱', color:'#8b6914', risk:'mid',  riskLabel:'중위험',
+    position:'파크 북서쪽 — 텃밭체험장⑦ 북측',
+    desc:'농업 교육 및 수확 체험 공간. 동물 접촉 프로그램 운영 시 물림·알레르기 발생 주의.',
+    capacity:'약 50명', area:'약 2,000㎡',
+    types:['동물물림','알레르기','열사병'], rate:9.2,
+    aed:'② 방문자센터 (약 300m)',
+    staff:'농장 전담 관리자 1명, 안전요원 1명',
+    checks:['동물 접촉 체험 전 안전 수칙 교육 필수','벌통·꿀벌 서식 구역 방문객 접근 통제','체험 전 알레르기 여부 사전 확인'],
+    action:'동물 물림 즉시 흐르는 물로 5분 이상 세척 후 119 신고, 알레르기 쇼크 시 에피펜 투여',
+    modal:'animal' },
+
+  { id:7,  name:'텃밭체험장',emoji:'🥕', color:'#c0392b', risk:'high', riskLabel:'고위험',
+    position:'잔디마당 남서쪽 — 농업체험장⑪ 북측',
+    desc:'방문객 직접 농사 체험 공간. 여름철 장시간 야외 활동으로 열사병 발생률이 가장 높습니다.',
+    capacity:'약 80명', area:'약 3,000㎡',
+    types:['열사병','동물물림','알레르기'], rate:11.1,
+    aed:'② 방문자센터 (약 350m)',
+    staff:'체험 진행 요원 2명, 안전요원 1명',
+    checks:['폭염 특보 시 야외 체험 중단 기준 사전 수립','그늘막·미스트 팬 상시 설치','체험 중 30분마다 수분 섭취 및 휴식 안내'],
+    action:'열사병 의심(체온 40°C↑, 의식 변화) 즉시 서늘한 곳으로 이동 후 119 신고',
+    modal:'heatstroke' },
+
+  { id:8,  name:'피크닉장',  emoji:'🍖', color:'#c0392b', risk:'high', riskLabel:'고위험',
+    position:'잔디마당 동남쪽 — 수변공간⑩ 북측',
+    desc:'야외 바베큐·캠프파이어 구역. 화상·식중독 집중 발생 지점으로 위생 및 화기 관리가 중요합니다.',
+    capacity:'약 150명', area:'약 4,000㎡',
+    types:['화상','식중독','낙상'], rate:14.4,
+    aed:'⑧ 피크닉장 안전 부스 (상시 비치)',
+    staff:'화기 안전 담당 1명, 응급처치 요원 1명',
+    checks:['바베큐 그릴 설치 거리 기준 준수 (시설물과 2m 이상)','어린이 화기 구역 접근 통제','음식 보관 온도 관리 (냉장 4°C 이하)'],
+    action:'화상 즉시 찬물 10~15분 냉각, 수포 터뜨리지 말 것. 2도 이상 화상 119 신고',
+    modal:'burn' },
+
+  { id:9,  name:'놀이터',    emoji:'🎠', color:'#c0392b', risk:'high', riskLabel:'고위험',
+    position:'파크 동쪽 — 수변공간⑩ 북서쪽',
+    desc:'어린이 전용 놀이 시설. 파크 내 낙상·골절 발생률이 가장 높은 최고 위험 구역입니다.',
+    capacity:'약 100명', area:'약 1,500㎡',
+    types:['낙상','골절','충돌사고','심정지'], rate:16.7,
+    aed:'놀이터 입구 안전 부스 (상시 비치)',
+    staff:'놀이시설 안전요원 2명 상시 배치',
+    checks:['놀이기구 안전 점검 운영 전 매일 실시','충격 흡수재(우레탄·모래) 상태 주 1회 점검','보호자 없는 유아(6세 미만) 입장 통제'],
+    action:'낙상 시 환자 이동 금지, 두부 충격 여부 확인 → 의식 변화 시 즉시 119, CPR 준비',
+    modal:'fall' },
+
+  { id:10, name:'수변공간',  emoji:'💧', color:'#c0392b', risk:'high', riskLabel:'고위험',
+    position:'파크 동남쪽 — 피크닉장⑧ 남측',
+    desc:'연못·수로 접근 구역. 익수 사고 및 수변 낙상 위험이 높은 고위험 지대입니다.',
+    capacity:'약 80명', area:'약 2,500㎡',
+    types:['익수','낙상','심정지'], rate:12.3,
+    aed:'⑧ 피크닉장 안전 부스 (약 100m)',
+    staff:'수변 전담 안전요원 1명 상시 배치',
+    checks:['수변 방호 울타리 파손 여부 매일 점검','어린이 수변 접근 보호자 동반 의무화','우천 시 수변 출입 통제'],
+    action:'익수 발생 즉시 119 신고 후 구명환 투척, 익수자 의식 없으면 CPR 즉시 시작',
+    modal:'cardiac' },
+
+  { id:11, name:'농업체험장',emoji:'🌾', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
+    position:'파크 남서쪽 최외곽 — 텃밭체험장⑦ 남측',
+    desc:'대형 농기계 체험 및 수확 체험 공간. 농기계 접촉 사고 및 동물 물림 주의구역입니다.',
+    capacity:'약 60명', area:'약 5,000㎡',
+    types:['동물물림','알레르기','낙상'], rate:7.9,
+    aed:'② 방문자센터 (약 450m — 파크 내 가장 먼 구역)',
+    staff:'농기계 전담 운전자 1명, 안전요원 1명',
+    checks:['농기계 체험 전 안전 교육 필수 (10분)','동물 접촉 구역 보호장갑 착용 의무화','AED 이동용 기기 현장 상시 비치 권고'],
+    action:'AED까지 거리가 가장 먼 구역 — 심정지 발생 시 CPR 즉시 시작하며 동시에 119 신고',
+    modal:'animal' },
+
+  { id:12, name:'주차장',    emoji:'🅿️', color:'#e67e22', risk:'mid',  riskLabel:'중위험',
+    position:'파크 동북쪽 — 주 차량 진입로 인접',
+    desc:'대형 주차 구역 및 버스 정류장. 차량 이동이 빈번하여 교통사고·미아 발생 주요 지점입니다.',
+    capacity:'차량 약 300대', area:'약 9,000㎡',
+    types:['교통사고','미아','실신'], rate:9.5,
+    aed:'주차장 안전초소 (상시 비치)',
+    staff:'주차 안내원 2명, 안전요원 1명',
+    checks:['보행자 동선과 차량 동선 완전 분리 확인','어린이 보호구역 속도 제한 (10km/h) 표지 점검','야간 조명 상태 매일 확인'],
+    action:'교통사고 시 즉시 119·112 신고, 차량 시동 끄고 2차 사고 방지 후 부상자 이동 금지',
+    modal:'traffic' },
 ];
 
-(function renderPins() {
-  const layer = document.getElementById('pin-layer');
-  FACILITIES.forEach(f => {
-    const pin = document.createElement('div');
-    pin.className = 'map-pin';
-    pin.style.left = f.left + '%';
-    pin.style.top  = f.top  + '%';
-    pin.dataset.id = f.num;
-    pin.innerHTML = `
-      <div class="pin-bubble risk-${f.risk}">⑩</div>
-      <div class="pin-tail"></div>
-      <div class="pin-dot"></div>`;
-    // 번호 원문자
-    const nums = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫'];
-    pin.querySelector('.pin-bubble').textContent = nums[f.num-1];
-    pin.addEventListener('click', e => { e.stopPropagation(); showMapPopup(f, pin); });
-    layer.appendChild(pin);
+/* ── zone click handler ── */
+const ZONE_COLORS = { high:'#c0392b', mid:'#e67e22', low:'#2d6a2d' };
+
+document.querySelectorAll('.zone-shape').forEach(el => {
+  el.addEventListener('click', function() {
+    const zid = parseInt(this.dataset.zone);
+    const z   = ZONES.find(x => x.id === zid);
+    document.querySelectorAll('.zone-shape').forEach(s => s.classList.remove('active'));
+    this.classList.add('active');
+    openDrawer(z);
   });
-  layer.addEventListener('click', () => removeMapPopup());
-})();
+});
 
-let activePopup = null;
+function openDrawer(z) {
+  const drawer = document.getElementById('zone-drawer');
+  const inner  = document.getElementById('drawer-inner');
+  const color  = ZONE_COLORS[z.risk];
 
-function showMapPopup(f, pin) {
-  removeMapPopup();
-  const layer  = document.getElementById('pin-layer');
-  const popup  = document.createElement('div');
-  popup.className = 'map-popup';
-  popup.innerHTML = `
-    <button class="mp-close-btn" onclick="removeMapPopup()">✕</button>
-    <div class="mp-head">
-      <div class="mp-num">${f.num}</div>
-      <div class="mp-name">${f.name}</div>
+  drawer.style.setProperty('--zone-color', color);
+  drawer.style.borderTopColor = color;
+
+  inner.innerHTML = `
+    <div class="drawer-head">
+      <div class="drawer-left">
+        <div class="drawer-num" style="background:${color}">${z.emoji}</div>
+        <div class="drawer-title">
+          <h3>⑩ ${z.name}</h3>
+          <p>📍 ${z.position}</p>
+        </div>
+      </div>
+      <span class="drawer-risk risk-${z.risk}">⚠️ ${z.riskLabel} · 발생률 ${z.rate}%</span>
     </div>
-    <div class="mp-risk risk-${f.risk}">
-      ⚠️ ${f.riskLabel} &nbsp;·&nbsp; 발생률 ${f.rate}%
-    </div>
-    <div class="mp-types">
-      ${f.types.map(t=>`<span class="mp-type">${t}</span>`).join('')}
-    </div>
-    <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;line-height:1.55">${f.desc}</p>
-    ${f.dataId ? `<button class="mp-btn" onclick="openModal('${f.dataId}');removeMapPopup()">📋 대응 매뉴얼 보기</button>` : ''}`;
 
-  // 팝업 위치 — 핀 기준으로 오른쪽 or 왼쪽
-  const pinL = parseFloat(f.left);
-  popup.style.top  = Math.max(2, f.top - 28) + '%';
-  popup.style.left = pinL > 38 ? (pinL - 24) + '%' : (pinL + 3) + '%';
+    <p style="font-size:14px;color:var(--text-mid);line-height:1.65;margin-bottom:16px">${z.desc}</p>
 
-  layer.appendChild(popup);
-  activePopup = popup;
+    <div class="drawer-grid">
+      <div class="drawer-cell">
+        <div class="drawer-cell-label">🏟️ 수용 인원</div>
+        <div class="drawer-cell-val">${z.capacity}</div>
+      </div>
+      <div class="drawer-cell">
+        <div class="drawer-cell-label">📐 면적</div>
+        <div class="drawer-cell-val">${z.area}</div>
+      </div>
+      <div class="drawer-cell">
+        <div class="drawer-cell-label">❤️ AED 위치</div>
+        <div class="drawer-cell-val">${z.aed}</div>
+      </div>
+      <div class="drawer-cell">
+        <div class="drawer-cell-label">👥 배치 인력</div>
+        <div class="drawer-cell-val">${z.staff}</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔴 주요 응급 유형</div>
+    <div class="drawer-types">
+      ${z.types.map(t=>`<span class="drawer-type">${t}</span>`).join('')}
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚡ 안전 점검 포인트</div>
+    <ul class="drawer-checks">
+      ${z.checks.map(c=>`<li class="drawer-check">${c}</li>`).join('')}
+    </ul>
+
+    <div class="drawer-action">🚨 <strong>즉각 대응:</strong> ${z.action}</div>
+
+    <div class="drawer-btns">
+      ${z.modal ? `<button class="drawer-btn-primary" style="background:${color}" onclick="openModal('${z.modal}')">📋 응급 대응 매뉴얼 보기</button>` : ''}
+      <button class="drawer-btn-close" onclick="closeDrawer()">✕ 닫기</button>
+    </div>`;
+
+  // 번호 원문자 치환
+  const nums = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫'];
+  inner.querySelector('h3').textContent = `${nums[z.id-1]} ${z.name}`;
+
+  drawer.classList.add('open');
+  setTimeout(() => drawer.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
 }
 
-function removeMapPopup() {
-  if (activePopup) { activePopup.remove(); activePopup = null; }
+function closeDrawer() {
+  document.getElementById('zone-drawer').classList.remove('open');
+  document.querySelectorAll('.zone-shape').forEach(s => s.classList.remove('active'));
 }
 
 /* ── fullscreen map ── */
