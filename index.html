@@ -222,6 +222,86 @@
       font-size:13px; color:#7a5c00; line-height:1.65;
     }
 
+    /* ── MAP SECTION ── */
+    .map-section { margin-top:56px; }
+
+    .map-wrap {
+      background:#fff; border-radius:20px;
+      box-shadow:var(--shadow); overflow:hidden;
+    }
+
+    .map-top {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 28px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(135deg,var(--green-dark),var(--green-main));
+      color:#fff;
+    }
+    .map-top-left { display:flex; align-items:center; gap:12px; }
+    .map-top-left h3 { font-size:16px; font-weight:700; }
+    .map-top-left p  { font-size:12px; opacity:.8; margin-top:2px; }
+    .map-badge {
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+      border-radius:20px; padding:5px 14px; font-size:12px;
+      display:flex; align-items:center; gap:6px;
+    }
+
+    .map-img-wrap {
+      position:relative; width:100%; background:#1a2e1a;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .map-img-wrap img {
+      width:100%; max-height:640px;
+      object-fit:contain; display:block;
+    }
+
+    .map-bottom {
+      padding:18px 28px;
+      background:#f8fbf4;
+      border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:12px;
+    }
+    .map-info {
+      display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    }
+    .map-info-item {
+      display:flex; align-items:center; gap:6px;
+      font-size:13px; color:var(--text-mid);
+    }
+    .zoom-btns { display:flex; gap:8px; }
+    .zoom-btn {
+      width:36px; height:36px; border-radius:8px;
+      border:1px solid var(--border);
+      background:#fff; cursor:pointer; font-size:18px;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .2s, border-color .2s;
+      color:var(--text-mid);
+    }
+    .zoom-btn:hover { background:var(--green-light); border-color:var(--green-main); }
+
+    /* fullscreen overlay */
+    .fs-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,.88);
+      display:none; align-items:center; justify-content:center;
+      z-index:2000; padding:24px;
+    }
+    .fs-overlay.open { display:flex; }
+    .fs-overlay img {
+      max-width:100%; max-height:100%;
+      object-fit:contain; border-radius:12px;
+      box-shadow:0 0 60px rgba(0,0,0,.6);
+    }
+    .fs-close {
+      position:fixed; top:20px; right:24px;
+      width:42px; height:42px; border-radius:12px;
+      background:rgba(255,255,255,.15); border:none; cursor:pointer;
+      color:#fff; font-size:22px;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .2s;
+    }
+    .fs-close:hover { background:rgba(255,255,255,.3); }
+
     /* ── FOOTER ── */
     footer {
       background:var(--green-dark); color:rgba(255,255,255,.6);
@@ -261,7 +341,56 @@
     <span class="count-badge">12개 유형</span>
   </div>
   <div class="cards-grid" id="grid"></div>
+
+  <!-- ── MAP SECTION ── -->
+  <div class="map-section" id="sec-map">
+    <div class="section-head">
+      <div class="section-title">시설 현황 지도</div>
+      <span class="count-badge">화성 에코팜 테마파크</span>
+    </div>
+
+    <div class="map-wrap">
+      <!-- 상단 바 -->
+      <div class="map-top">
+        <div class="map-top-left">
+          <span style="font-size:26px">🗺️</span>
+          <div>
+            <h3>화성 에코팜 테마파크 배치도</h3>
+            <p>경기도 화성시 우정읍 매향리 216-1번지 &nbsp;|&nbsp; 면적 148,500㎡</p>
+          </div>
+        </div>
+        <div class="map-badge">📍 주요 시설 12개소</div>
+      </div>
+
+      <!-- 지도 이미지 -->
+      <div class="map-img-wrap" id="map-img-wrap">
+        <img src="map.png" alt="화성 에코팜 테마파크 지도" id="map-img" />
+      </div>
+
+      <!-- 하단 바 -->
+      <div class="map-bottom">
+        <div class="map-info">
+          <div class="map-info-item">🏕️ 잔디마당 · 캠핑존</div>
+          <div class="map-info-item">🌾 교육농장 · 텃밭체험장</div>
+          <div class="map-info-item">⚽ 풋살장 · 테니스장</div>
+          <div class="map-info-item">🧒 어린이놀이터 · 수변공간</div>
+          <div class="map-info-item">🅿️ 주차장 · 방문자센터</div>
+        </div>
+        <div class="zoom-btns">
+          <button class="zoom-btn" title="확대해서 보기" onclick="openFullscreen()">⛶</button>
+          <button class="zoom-btn" title="새 탭에서 열기" onclick="window.open('map.png','_blank')">↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
+
+<!-- 풀스크린 지도 오버레이 -->
+<div class="fs-overlay" id="fs-overlay" onclick="closeFullscreen()">
+  <button class="fs-close" onclick="closeFullscreen()">✕</button>
+  <img src="map.png" alt="화성 에코팜 테마파크 지도 전체보기" />
+</div>
 
 <footer>© 2026 에코팜테마파크 안전관리팀 &nbsp;|&nbsp; AI 응급대응 시스템 v1.0</footer>
 
@@ -562,7 +691,26 @@ function onOverlayClick(e) {
   if (e.target === document.getElementById('overlay')) closeModal();
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeFullscreen(); }
+});
+
+/* ── fullscreen map ── */
+function openFullscreen()  { document.getElementById('fs-overlay').classList.add('open');    document.body.style.overflow='hidden'; }
+function closeFullscreen() { document.getElementById('fs-overlay').classList.remove('open'); document.body.style.overflow=''; }
+
+/* ── nav scroll ── */
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    if (this.textContent.includes('시설 현황')) {
+      document.getElementById('sec-map').scrollIntoView({ behavior:'smooth', block:'start' });
+    } else if (this.textContent.includes('응급 대응')) {
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+  });
+});
 
 /* ── date ── */
 document.getElementById('cur-date').textContent =
