@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>에코팜테마파크 응급상황 대응 시스템</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-dark:   #1e4d1e;
+      --green-main:   #2d6a2d;
+      --green-mid:    #4a8a3a;
+      --green-light:  #c8dfc0;
+      --earth:        #8b6914;
+      --gold:         #e8c44a;
+      --gold-dark:    #c9a832;
+      --bg:           #f0f4e8;
+      --bg-card:      #ffffff;
+      --text-dark:    #1e3a1e;
+      --text-mid:     #4a6741;
+      --text-light:   #7a9970;
+      --border:       #d0ddc0;
+      --shadow:       0 4px 20px rgba(45,106,45,.12);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--text-dark); min-height:100vh; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-main) 60%, var(--green-mid) 100%);
+      color:#fff;
+      box-shadow: 0 2px 20px rgba(0,0,0,.25);
+    }
+    .header-top {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 40px;
+    }
+    .logo-wrap { display:flex; align-items:center; gap:16px; }
+    .logo-icon {
+      width:56px; height:56px; border-radius:16px;
+      background:rgba(255,255,255,.15);
+      display:flex; align-items:center; justify-content:center; font-size:28px;
+    }
+    .logo-text h1 { font-size:22px; font-weight:700; letter-spacing:-.5px; }
+    .logo-text p  { font-size:13px; opacity:.8; margin-top:2px; }
+
+    .status-wrap { display:flex; align-items:center; gap:12px; }
+    .status-chip {
+      display:flex; align-items:center; gap:8px;
+      background:rgba(255,255,255,.12); padding:8px 16px;
+      border-radius:20px; font-size:13px;
+    }
+    .dot {
+      width:8px; height:8px; border-radius:50%; background:#4ade80;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .header-nav {
+      background:rgba(0,0,0,.18); padding:0 40px;
+      display:flex; gap:4px;
+    }
+    .nav-btn {
+      padding:12px 20px; font-size:13px; color:rgba(255,255,255,.75);
+      cursor:pointer; border-bottom:2px solid transparent;
+      transition:all .2s; user-select:none;
+    }
+    .nav-btn.active, .nav-btn:hover {
+      color:#fff; border-bottom-color:var(--gold);
+    }
+
+    /* ── MAIN ── */
+    main { max-width:1220px; margin:0 auto; padding:40px 24px 60px; }
+
+    .section-head {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:28px;
+    }
+    .section-title {
+      font-size:20px; font-weight:700; color:var(--text-dark);
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-title::before {
+      content:''; width:4px; height:22px;
+      background:var(--green-main); border-radius:2px;
+    }
+    .count-badge {
+      background:var(--green-main); color:#fff;
+      font-size:11px; font-weight:600;
+      padding:3px 10px; border-radius:20px;
+    }
+
+    /* ── CARDS GRID ── */
+    .cards-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap:16px;
+    }
+    .e-card {
+      background:#fff; border-radius:16px; padding:24px 22px 44px;
+      cursor:pointer; position:relative; overflow:hidden;
+      border:2px solid transparent;
+      box-shadow:var(--shadow);
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .e-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:4px;
+      background:var(--c, var(--green-main));
+    }
+    .e-card:hover {
+      transform:translateY(-5px);
+      box-shadow:0 10px 32px rgba(45,106,45,.2);
+      border-color:var(--c, var(--green-main));
+    }
+    .e-icon   { font-size:38px; margin-bottom:12px; }
+    .e-name   { font-size:17px; font-weight:700; margin-bottom:8px; }
+    .e-chips  { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .chip {
+      font-size:11px; font-weight:600;
+      padding:3px 8px; border-radius:6px;
+    }
+    .chip-cnt  { background:#f0f4e8; color:var(--text-mid); }
+    .chip-high { background:#fde8e8; color:#c0392b; }
+    .chip-mid  { background:#fef3e2; color:#d68910; }
+    .chip-low  { background:#e8f5e9; color:#1e7e34; }
+    .e-desc    { font-size:13px; color:var(--text-light); line-height:1.55; }
+
+    .e-arrow {
+      position:absolute; right:18px; bottom:16px;
+      width:32px; height:32px; border-radius:8px;
+      background:var(--bg); color:var(--text-mid);
+      display:flex; align-items:center; justify-content:center; font-size:15px;
+      transition:background .2s, color .2s;
+    }
+    .e-card:hover .e-arrow { background:var(--c, var(--green-main)); color:#fff; }
+
+    /* ── MODAL ── */
+    .overlay {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.5); backdrop-filter:blur(4px);
+      display:none; align-items:center; justify-content:center;
+      z-index:1000; padding:24px;
+    }
+    .overlay.open { display:flex; }
+
+    .modal {
+      background:#fff; border-radius:24px;
+      width:100%; max-width:680px; max-height:88vh;
+      overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,.3);
+      animation:slideUp .28s ease;
+    }
+    @keyframes slideUp { from{transform:translateY(28px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+    .m-head {
+      display:flex; align-items:flex-start; gap:16px;
+      padding:28px 32px 20px;
+      border-bottom:1px solid #eee;
+      position:sticky; top:0; background:#fff;
+      border-radius:24px 24px 0 0; z-index:1;
+    }
+    .m-icon { font-size:46px; flex-shrink:0; }
+    .m-title-area h2 { font-size:22px; font-weight:700; margin-bottom:6px; }
+    .sev-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:12px; font-weight:600;
+      padding:4px 12px; border-radius:20px;
+    }
+    .sev-high { background:#fde8e8; color:#c0392b; }
+    .sev-mid  { background:#fef3e2; color:#d68910; }
+    .sev-low  { background:#e8f5e9; color:#1e7e34; }
+    .m-close {
+      margin-left:auto; flex-shrink:0;
+      width:36px; height:36px; border-radius:10px;
+      border:none; background:#f4f4f4; cursor:pointer;
+      font-size:18px; display:flex; align-items:center; justify-content:center;
+      transition:background .2s;
+    }
+    .m-close:hover { background:#e8e8e8; }
+
+    .m-body { padding:24px 32px 36px; }
+    .m-sec { margin-bottom:26px; }
+    .m-sec-title {
+      font-size:12px; font-weight:700; color:var(--green-main);
+      text-transform:uppercase; letter-spacing:.6px;
+      margin-bottom:14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .m-sec-title::after { content:''; flex:1; height:1px; background:#ebebeb; }
+
+    /* Steps */
+    .steps { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .step  { display:flex; gap:12px; align-items:flex-start; }
+    .step-n {
+      width:24px; height:24px; flex-shrink:0;
+      background:var(--green-main); color:#fff;
+      border-radius:50%; font-size:12px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      margin-top:1px;
+    }
+    .step-t { font-size:14px; line-height:1.65; }
+
+    /* Resources */
+    .res-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .res-item { background:var(--bg); border-radius:12px; padding:14px 16px; }
+    .res-label { font-size:11px; color:var(--text-light); font-weight:600; margin-bottom:4px; }
+    .res-val   { font-size:13px; color:var(--text-dark); font-weight:500; line-height:1.5; }
+
+    /* Facility chips */
+    .fac-chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .fac-chip {
+      background:#e8f5e9; color:var(--green-main);
+      border:1px solid var(--green-light);
+      border-radius:8px; padding:6px 12px;
+      font-size:13px; font-weight:500;
+    }
+
+    /* Alert */
+    .alert-box {
+      background:#fffbe8; border:1px solid #f0d870;
+      border-left:4px solid var(--gold-dark);
+      border-radius:10px; padding:13px 16px;
+      font-size:13px; color:#7a5c00; line-height:1.65;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background:var(--green-dark); color:rgba(255,255,255,.6);
+      text-align:center; padding:22px; font-size:13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="header-top">
+    <div class="logo-wrap">
+      <div class="logo-icon">🌿</div>
+      <div class="logo-text">
+        <h1>에코팜테마파크</h1>
+        <p>응급상황 AI 대응 시스템</p>
+      </div>
+    </div>
+    <div class="status-wrap">
+      <div class="status-chip"><div class="dot"></div>시스템 정상 운영 중</div>
+      <div class="status-chip">📅 <span id="cur-date"></span></div>
+    </div>
+  </div>
+  <div class="header-nav">
+    <div class="nav-btn active">🚨 응급 대응 매뉴얼</div>
+    <div class="nav-btn">📊 위험도 모니터링</div>
+    <div class="nav-btn">🗺️ 시설 현황</div>
+    <div class="nav-btn">📋 대응 이력</div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main>
+  <div class="section-head">
+    <div class="section-title">응급상황 유형 선택</div>
+    <span class="count-badge">12개 유형</span>
+  </div>
+  <div class="cards-grid" id="grid"></div>
+</main>
+
+<footer>© 2026 에코팜테마파크 안전관리팀 &nbsp;|&nbsp; AI 응급대응 시스템 v1.0</footer>
+
+<!-- ── MODAL ── -->
+<div class="overlay" id="overlay" onclick="onOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="m-head">
+      <div class="m-icon" id="m-icon"></div>
+      <div class="m-title-area">
+        <h2 id="m-title"></h2>
+        <div id="m-sev"></div>
+      </div>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {
+    id:'fall', icon:'🤕', name:'낙상', color:'#e67e22',
+    count:215, severeRate:14.4, severity:'high',
+    desc:'바닥 미끄러짐, 계단·시설 추락 등 낙상 사고',
+    steps:[
+      '즉시 이동을 금지하고 환자를 현장에서 안정시킵니다.',
+      '의식과 호흡 상태를 확인합니다.',
+      '척추·두부 손상 가능성을 고려해 머리와 목을 고정합니다.',
+      '출혈 부위가 있으면 깨끗한 천으로 압박 지혈합니다.',
+      '119에 즉시 신고하고 위치와 상태를 정확히 전달합니다.',
+      '의식이 있으면 말을 걸어 안심시키며 체온을 유지합니다.',
+    ],
+    personnel:'안전요원 2명, 응급처치 요원 1명',
+    equipment:'척추고정판, AED, 지혈대, 응급구호키트',
+    facilities:['캠핑장A','캠핑장B','전망대','놀이시설존'],
+    alert:'고령 방문객 낙상 시 고관절 골절 가능성이 높습니다. 반드시 전문의 진찰을 권고하세요.',
+  },
+  {
+    id:'cardiac', icon:'❤️‍🔥', name:'심정지', color:'#c0392b',
+    count:123, severeRate:8.1, severity:'high',
+    desc:'급성 심정지, 의식 소실 및 호흡 정지',
+    steps:[
+      '즉시 119에 신고합니다. (골든타임 4분)',
+      '환자 반응과 호흡 유무를 확인합니다.',
+      '가슴 압박 30회 + 인공호흡 2회 CPR을 시작합니다.',
+      '가장 가까운 AED를 즉시 가져와 전원을 켭니다.',
+      'AED 음성 안내에 따라 패드를 부착하고 충격을 가합니다.',
+      '구급대 도착까지 CPR을 절대 중단하지 않습니다.',
+    ],
+    personnel:'응급처치 전문 요원 2명, 관리자 1명',
+    equipment:'AED(자동심장충격기), 산소공급장치, 응급구호키트',
+    facilities:['캠핑장A','캠핑장B','체험농장','전망대','놀이시설존'],
+    alert:'심정지는 4분 이내 처치가 생사를 결정합니다. 모든 직원의 CPR 자격증 보유를 권장합니다.',
+  },
+  {
+    id:'burn', icon:'🔥', name:'화상', color:'#e74c3c',
+    count:69, severeRate:5.8, severity:'mid',
+    desc:'불꽃, 뜨거운 물체, 직사광선에 의한 화상',
+    steps:[
+      '즉시 화상 부위를 흐르는 찬물로 10~15분 이상 냉각합니다.',
+      '옷이나 장신구가 화상 부위에 붙어 있으면 억지로 제거하지 않습니다.',
+      '수포(물집)는 절대 터뜨리지 않습니다.',
+      '깨끗한 거즈나 천으로 화상 부위를 덮습니다.',
+      '얼음·된장·치약 등은 절대 바르지 않습니다.',
+      '2도 이상 또는 광범위한 경우 즉시 119에 신고합니다.',
+    ],
+    personnel:'응급처치 요원 1명, 보조 요원 1명',
+    equipment:'화상 처치 키트, 거즈, 냉각 스프레이, 식염수',
+    facilities:['캠핑장A','캠핑장B','체험농장'],
+    alert:'바베큐·캠프파이어 구역 주변에서 발생 빈도가 높습니다. 해당 구역 순찰을 강화하세요.',
+  },
+  {
+    id:'fracture', icon:'🦴', name:'골절', color:'#8e44ad',
+    count:67, severeRate:4.5, severity:'mid',
+    desc:'뼈 골절 및 탈구 사고',
+    steps:[
+      '골절 부위를 움직이지 않도록 즉시 고정합니다.',
+      '부목(나뭇가지·판자 등)으로 골절 부위를 고정합니다.',
+      '부목과 피부 사이에 패드(옷감 등)를 대어 압박을 완화합니다.',
+      '개방성 골절(뼈 노출)인 경우 즉시 119에 신고합니다.',
+      '출혈 시 지혈하고, 쇼크 증상(창백·식은땀)을 관찰합니다.',
+      '119 대기 중 환자를 따뜻하게 유지합니다.',
+    ],
+    personnel:'안전요원 1명, 응급처치 요원 1명',
+    equipment:'부목, 붕대, 지혈대, 응급구호키트',
+    facilities:['놀이시설존','전망대','체험농장'],
+    alert:'놀이시설존에서 어린이 골절 빈도가 높습니다. 놀이기구 주변 충격 흡수재를 정기적으로 점검하세요.',
+  },
+  {
+    id:'heatstroke', icon:'🌡️', name:'열사병', color:'#d35400',
+    count:66, severeRate:16.7, severity:'high',
+    desc:'고온 환경 장시간 노출로 인한 체온 조절 장애',
+    steps:[
+      '즉시 서늘하고 그늘진 곳으로 환자를 이동합니다.',
+      '옷을 느슨하게 풀고 환기를 시킵니다.',
+      '의식이 있으면 시원한 물이나 이온음료를 천천히 섭취하게 합니다.',
+      '찬 수건으로 목·겨드랑이·사타구니를 냉각합니다.',
+      '의식이 없거나 체온 40°C 이상이면 즉시 119에 신고합니다.',
+      '구급대 도착 전까지 체온을 지속적으로 낮춥니다.',
+    ],
+    personnel:'의료 담당 요원 1명, 보조 요원 2명',
+    equipment:'냉각 팩, 체온계, 이온음료, 그늘막, 선풍기',
+    facilities:['캠핑장A','캠핑장B','체험농장','놀이시설존'],
+    alert:'여름 폭염일(33°C 이상) 13시·15시 피크 시간대에 발생률 9.22%로 급등합니다. 해당 시간 순찰을 2배 강화하세요.',
+  },
+  {
+    id:'collision', icon:'💥', name:'충돌사고', color:'#2980b9',
+    count:64, severeRate:4.7, severity:'low',
+    desc:'방문객 간 또는 시설물과의 충돌 사고',
+    steps:[
+      '충돌 부위 출혈 및 골절 여부를 확인합니다.',
+      '두부 충격 시 즉각적인 의식 확인이 필요합니다.',
+      '경미한 타박상은 냉찜질을 적용합니다.',
+      '두통·구토·의식 저하 증상 시 즉시 119에 신고합니다.',
+      '사고 현장을 보존하여 원인 분석에 활용합니다.',
+    ],
+    personnel:'안전요원 1명, 응급처치 요원 1명',
+    equipment:'냉각 팩, 붕대, 응급구호키트',
+    facilities:['놀이시설존','주차장/매표소'],
+    alert:'놀이시설존 좁은 통로에서 충돌 빈도가 높습니다. 혼잡 시간대 일방통행 동선 운영을 권고합니다.',
+  },
+  {
+    id:'food', icon:'🤢', name:'식중독', color:'#27ae60',
+    count:61, severeRate:16.4, severity:'high',
+    desc:'오염된 음식 섭취로 인한 급성 식중독',
+    steps:[
+      '동일 음식을 섭취한 다른 방문객 현황을 즉시 파악합니다.',
+      '환자를 안정된 장소로 이동시키고 안정을 취하게 합니다.',
+      '구토를 억지로 유발하지 않습니다.',
+      '의식이 있으면 물을 조금씩 천천히 섭취하게 합니다.',
+      '집단 발생 징후 시 즉시 보건소(식품안전신고 1399)에 신고합니다.',
+      '원인 음식을 보관·봉인하여 역학조사에 협조합니다.',
+    ],
+    personnel:'의료 담당 요원 1명, 관리자 1명',
+    equipment:'구급약품, 수액 공급 키트, 위생 봉투',
+    facilities:['캠핑장A','캠핑장B','체험농장'],
+    alert:'캠프파이어 음식 조리 구역 위생 점검을 주 1회 의무화하고, 집단 발생 시 즉시 식약처에 신고하세요.',
+  },
+  {
+    id:'traffic', icon:'🚗', name:'교통사고', color:'#c0392b',
+    count:42, severeRate:9.5, severity:'high',
+    desc:'파크 내 차량 관련 사고',
+    steps:[
+      '즉시 119 및 112에 신고하고 현장을 보전합니다.',
+      '차량 시동을 끄고 화재 위험을 확인합니다.',
+      '부상자를 차량에서 무리하게 이동시키지 않습니다.',
+      '2차 사고 방지를 위해 주변 통행을 차단합니다.',
+      '목격자 정보와 CCTV 영상을 즉시 확보합니다.',
+      '부상자 의식·호흡을 지속 확인하며 구급대를 기다립니다.',
+    ],
+    personnel:'안전요원 2명, 관리자 1명',
+    equipment:'삼각대, 응급구호키트, 소화기',
+    facilities:['주차장/매표소'],
+    alert:'주차장 내 보행자 통로와 차량 동선이 교차하는 구간에 방호울타리 설치를 권고합니다.',
+  },
+  {
+    id:'allergy', icon:'🤧', name:'알레르기', color:'#16a085',
+    count:38, severeRate:7.9, severity:'mid',
+    desc:'음식·식물·곤충 등에 의한 알레르기 반응',
+    steps:[
+      '알레르기 원인 물질을 즉시 제거하거나 환자를 분리합니다.',
+      '항히스타민제를 투여합니다. (보유 시)',
+      '아나필락시스 쇼크(호흡 곤란·혈압 저하) 시 에피네프린 투여 후 119에 신고합니다.',
+      '에피펜 보유 방문객이라면 직접 사용하도록 안내합니다.',
+      '호흡이 정상이면 앉은 자세, 어지러우면 누운 자세를 유지합니다.',
+      '증상 호전 여부와 관계없이 전문의 진찰을 권고합니다.',
+    ],
+    personnel:'의료 담당 요원 1명',
+    equipment:'항히스타민제, 에피네프린(에피펜), 산소공급장치',
+    facilities:['체험농장','캠핑장A','캠핑장B'],
+    alert:'체험농장에 식물·벌 등 알레르기 유발 요소가 많습니다. 입장 전 방문객 알레르기 여부를 확인하세요.',
+  },
+  {
+    id:'faint', icon:'😵', name:'실신', color:'#2980b9',
+    count:36, severeRate:8.3, severity:'mid',
+    desc:'일시적 의식 소실 및 실신',
+    steps:[
+      '환자를 안전한 곳에 눕히고 다리를 심장보다 높게 올립니다.',
+      '옷을 느슨하게 풀고 신선한 공기가 통하게 합니다.',
+      '1~2분 내 의식 회복 여부를 관찰합니다.',
+      '의식 회복 후 천천히 일으키고 앉은 자세를 유지합니다.',
+      '의식이 회복되지 않거나 호흡이 없으면 CPR 시작 후 119에 신고합니다.',
+      '회복 후에도 두통·흉통이 있으면 즉시 의료기관 방문을 안내합니다.',
+    ],
+    personnel:'안전요원 1명, 응급처치 요원 1명',
+    equipment:'응급구호키트, 혈압계, 혈당 측정기',
+    facilities:['전망대','캠핑장A','놀이시설존'],
+    alert:'더운 날 장시간 대기 줄에서 실신 빈도가 높습니다. 그늘막 설치와 수분 섭취를 독려하세요.',
+  },
+  {
+    id:'lost', icon:'👦', name:'미아', color:'#f39c12',
+    count:28, severeRate:7.1, severity:'low',
+    desc:'어린이 또는 노약자 미아 발생',
+    steps:[
+      '미아 발생 즉시 파크 내 방송 시스템으로 안내 방송을 실시합니다.',
+      '발생 시각·마지막 목격 장소·아동 특징(옷 색상·이름)을 수집합니다.',
+      '안전요원을 주요 출입구 및 시설 입구에 즉시 배치합니다.',
+      '보호자와 함께 CCTV 모니터링을 시작합니다.',
+      '30분 이내 발견되지 않으면 경찰(112)에 신고합니다.',
+      '아동 발견 시 보호자 신원을 확인한 후 인계합니다.',
+    ],
+    personnel:'안전요원 3명 이상, 방송 담당 1명',
+    equipment:'무전기, 방송 장비, CCTV 모니터',
+    facilities:['주차장/매표소','놀이시설존','캠핑장A','캠핑장B'],
+    alert:'입장 시 보호자에게 아동용 미아 방지 팔찌(연락처 기재) 착용을 권고하세요.',
+  },
+  {
+    id:'animal', icon:'🐾', name:'동물물림', color:'#8b6914',
+    count:27, severeRate:11.1, severity:'mid',
+    desc:'파크 내 동물에 의한 물림·할큄 사고',
+    steps:[
+      '상처 부위를 흐르는 물과 비누로 5분 이상 충분히 씻어냅니다.',
+      '출혈이 있으면 깨끗한 천으로 압박 지혈합니다.',
+      '상처가 깊거나 넓은 경우 즉시 119 신고 후 병원으로 이송합니다.',
+      '물린 동물의 종류와 상태(광견병 가능성)를 파악합니다.',
+      '상처 주변 부기·발적·열감을 관찰합니다.',
+      '파상풍 미접종자는 즉시 의료기관 방문을 안내합니다.',
+    ],
+    personnel:'응급처치 요원 1명, 동물 관리 담당 1명',
+    equipment:'소독약, 거즈, 붕대, 지혈대',
+    facilities:['체험농장','캠핑장A','캠핑장B'],
+    alert:'체험농장 방문객에게 동물 접촉 수칙(먹이주기 방법·접근 금지 구역)을 사전 교육하세요.',
+  },
+];
+
+const SEV = {
+  high: { label:'고위험', cls:'sev-high' },
+  mid:  { label:'중위험', cls:'sev-mid'  },
+  low:  { label:'저위험', cls:'sev-low'  },
+};
+
+function chipClass(rate) {
+  return rate >= 12 ? 'chip-high' : rate >= 7 ? 'chip-mid' : 'chip-low';
+}
+
+/* ── render cards ── */
+(function renderCards() {
+  document.getElementById('grid').innerHTML = DATA.map(e => `
+    <div class="e-card" style="--c:${e.color}" onclick="openModal('${e.id}')">
+      <div class="e-icon">${e.icon}</div>
+      <div class="e-name">${e.name}</div>
+      <div class="e-chips">
+        <span class="chip chip-cnt">연 ${e.count}건</span>
+        <span class="chip ${chipClass(e.severeRate)}">중증 ${e.severeRate}%</span>
+      </div>
+      <div class="e-desc">${e.desc}</div>
+      <div class="e-arrow">→</div>
+    </div>
+  `).join('');
+})();
+
+/* ── modal ── */
+function openModal(id) {
+  const e = DATA.find(x => x.id === id);
+  const s = SEV[e.severity];
+  document.getElementById('m-icon').textContent  = e.icon;
+  document.getElementById('m-title').textContent = e.name;
+  document.getElementById('m-sev').innerHTML =
+    `<span class="sev-badge ${s.cls}">⚠️ ${s.label} · 중증 발생률 ${e.severeRate}%</span>`;
+
+  document.getElementById('m-body').innerHTML = `
+    <div class="m-sec">
+      <div class="m-sec-title">대응 절차</div>
+      <ul class="steps">
+        ${e.steps.map((t,i)=>`
+          <li class="step">
+            <span class="step-n">${i+1}</span>
+            <span class="step-t">${t}</span>
+          </li>`).join('')}
+      </ul>
+    </div>
+    <div class="m-sec">
+      <div class="m-sec-title">투입 인력 · 장비</div>
+      <div class="res-grid">
+        <div class="res-item"><div class="res-label">👥 투입 인력</div><div class="res-val">${e.personnel}</div></div>
+        <div class="res-item"><div class="res-label">🧰 필요 장비</div><div class="res-val">${e.equipment}</div></div>
+      </div>
+    </div>
+    <div class="m-sec">
+      <div class="m-sec-title">주요 발생 시설</div>
+      <div class="fac-chips">${e.facilities.map(f=>`<span class="fac-chip">📍 ${f}</span>`).join('')}</div>
+    </div>
+    <div class="m-sec">
+      <div class="m-sec-title">주의 사항</div>
+      <div class="alert-box">⚠️ ${e.alert}</div>
+    </div>`;
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function onOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ── date ── */
+document.getElementById('cur-date').textContent =
+  new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+</script>
+</body>
+</html>
