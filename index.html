@@ -133,6 +133,70 @@
       transition:background .2s, color .2s;
     }
     .e-card:hover .e-arrow { background:var(--c, var(--green-main)); color:#fff; }
+    .e-card.selected {
+      border-color:var(--c, var(--green-main));
+      transform:translateY(-5px);
+      box-shadow:0 10px 32px rgba(45,106,45,.25);
+    }
+    .e-card.selected .e-arrow { background:var(--c, var(--green-main)); color:#fff; }
+
+    /* ── 직원호출 바 ── */
+    .call-bar {
+      display:none; margin-top:16px;
+      background:#fff; border-radius:16px; padding:18px 24px;
+      box-shadow:var(--shadow);
+      border-left:5px solid var(--call-c, var(--green-main));
+      align-items:center; justify-content:space-between;
+      gap:16px; flex-wrap:wrap;
+      animation:cbIn .22s ease;
+    }
+    .call-bar.show { display:flex; }
+    @keyframes cbIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .cb-info { display:flex; align-items:center; gap:14px; }
+    .cb-icon { font-size:32px; }
+    .cb-text h4 { font-size:15px; font-weight:700; margin-bottom:3px; }
+    .cb-text p  { font-size:12px; color:var(--text-light); }
+    .cb-btns { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-manual {
+      background:#f0f4e8; color:var(--text-dark); border:none;
+      border-radius:10px; padding:10px 18px;
+      font-size:13px; font-weight:600; cursor:pointer;
+      transition:background .2s;
+    }
+    .btn-manual:hover { background:var(--green-light); }
+    .btn-call {
+      background:#c0392b; color:#fff; border:none;
+      border-radius:10px; padding:10px 22px;
+      font-size:14px; font-weight:700; cursor:pointer;
+      display:flex; align-items:center; gap:7px;
+      transition:opacity .2s;
+    }
+    .btn-call:hover { opacity:.85; }
+    .btn-call:disabled { opacity:.55; cursor:default; }
+
+    /* ── 대응 이력 ── */
+    .history-section { margin-top:36px; }
+    .history-empty {
+      background:#fff; border-radius:12px; padding:40px;
+      text-align:center; color:var(--text-light); font-size:14px;
+      box-shadow:var(--shadow);
+    }
+    .history-item {
+      background:#fff; border-radius:12px; padding:16px 20px;
+      margin-bottom:10px; display:flex; align-items:center; gap:16px;
+      box-shadow:var(--shadow);
+      border-left:5px solid var(--h-c, var(--green-main));
+      animation:cbIn .22s ease;
+    }
+    .hi-icon  { font-size:28px; flex-shrink:0; }
+    .hi-info  { flex:1; }
+    .hi-name  { font-size:14px; font-weight:700; margin-bottom:3px; }
+    .hi-time  { font-size:12px; color:var(--text-light); }
+    .hi-badge {
+      background:#e8f5e9; color:#1e7e34;
+      font-size:11px; font-weight:700;
+      padding:4px 12px; border-radius:20px; white-space:nowrap;
+    }
 
     /* ── MODAL ── */
     .overlay {
@@ -456,6 +520,21 @@
   </div>
   <div class="cards-grid" id="grid"></div>
 
+  <!-- ── 직원호출 바 ── -->
+  <div class="call-bar" id="call-bar">
+    <div class="cb-info">
+      <div class="cb-icon" id="cb-icon"></div>
+      <div class="cb-text">
+        <h4 id="cb-name"></h4>
+        <p id="cb-desc"></p>
+      </div>
+    </div>
+    <div class="cb-btns">
+      <button class="btn-manual" id="btn-manual">📋 매뉴얼 보기</button>
+      <button class="btn-call"   id="btn-call"   onclick="callStaff()">📢 직원 호출</button>
+    </div>
+  </div>
+
   <!-- ── MAP SECTION ── -->
   <div class="map-section" id="sec-map">
     <div class="section-head">
@@ -559,6 +638,17 @@
           <button class="zoom-btn" title="새 탭에서 열기" onclick="window.open('map.png','_blank')">↗</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── 대응 이력 ── -->
+  <div class="history-section" id="history-section">
+    <div class="section-head">
+      <div class="section-title">대응 이력</div>
+      <span class="count-badge" id="history-count">0건</span>
+    </div>
+    <div id="history-list">
+      <div class="history-empty">📋 아직 호출 이력이 없습니다.<br><small style="margin-top:6px;display:block">응급 유형 선택 후 직원 호출 버튼을 누르면 이곳에 기록됩니다.</small></div>
     </div>
   </div>
 
@@ -807,7 +897,7 @@ function chipClass(rate) {
 /* ── render cards ── */
 (function renderCards() {
   document.getElementById('grid').innerHTML = DATA.map(e => `
-    <div class="e-card" style="--c:${e.color}" onclick="openModal('${e.id}')">
+    <div class="e-card" style="--c:${e.color}" data-id="${e.id}" onclick="selectType('${e.id}')">
       <div class="e-icon">${e.icon}</div>
       <div class="e-name">${e.name}</div>
       <div class="e-chips">
@@ -819,6 +909,69 @@ function chipClass(rate) {
     </div>
   `).join('');
 })();
+
+/* ── 유형 선택 + 직원호출 ── */
+let _selType = null;
+const historyLog = [];
+
+function selectType(id) {
+  _selType = id;
+  const e = DATA.find(x => x.id === id);
+
+  document.querySelectorAll('.e-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.e-card[data-id="${id}"]`).classList.add('selected');
+
+  const bar = document.getElementById('call-bar');
+  document.getElementById('cb-icon').textContent = e.icon;
+  document.getElementById('cb-name').textContent = e.name + ' 응급상황 선택됨';
+  document.getElementById('cb-desc').textContent = e.desc;
+  document.getElementById('btn-manual').onclick = () => openModal(id);
+  document.getElementById('btn-call').textContent = '📢 직원 호출';
+  document.getElementById('btn-call').disabled = false;
+  bar.style.setProperty('--call-c', e.color);
+  bar.classList.add('show');
+  bar.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function callStaff() {
+  if (!_selType) return;
+  const e = DATA.find(x => x.id === _selType);
+  historyLog.unshift({ e, time: new Date() });
+  renderHistory();
+
+  const btn = document.getElementById('btn-call');
+  btn.textContent = '✅ 호출 완료!';
+  btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('history-section').scrollIntoView({ behavior:'smooth' });
+  }, 300);
+}
+
+function renderHistory() {
+  const list  = document.getElementById('history-list');
+  const badge = document.getElementById('history-count');
+  badge.textContent = historyLog.length + '건';
+
+  if (!historyLog.length) {
+    list.innerHTML = '<div class="history-empty">📋 아직 호출 이력이 없습니다.</div>';
+    return;
+  }
+  list.innerHTML = historyLog.map(({ e, time }) => {
+    const ts = time.toLocaleString('ko-KR', {
+      month:'long', day:'numeric',
+      hour:'2-digit', minute:'2-digit', second:'2-digit'
+    });
+    return `
+      <div class="history-item" style="--h-c:${e.color}">
+        <div class="hi-icon">${e.icon}</div>
+        <div class="hi-info">
+          <div class="hi-name">${e.name}</div>
+          <div class="hi-time">${ts}</div>
+        </div>
+        <span class="hi-badge">📢 직원호출 완료</span>
+      </div>`;
+  }).join('');
+}
 
 /* ── modal ── */
 function openModal(id) {
